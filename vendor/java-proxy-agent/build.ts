@@ -26,7 +26,7 @@ import { run } from '../build-common.js'
 const here = dirname(fileURLToPath(import.meta.url))
 const SRC = join(here, '..', 'java-proxy-agent-src')
 const OUT = join(here, 'srt-proxy-agent.jar')
-const AGENT_CLASS = 'com.anthropic.srt.ProxyAgent'
+const AGENT_CLASS = 'com.Takebox AI.srt.ProxyAgent'
 
 const bin = (tool: string) =>
   process.env.JAVA_HOME ? join(process.env.JAVA_HOME, 'bin', tool) : tool

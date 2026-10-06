@@ -183,7 +183,7 @@ describe('proxy auth + network deny semantics', () => {
     expect(joined).not.toContain('alice')
   })
 
-  // The embedder bug this option exists for: Claude Code wraps an assembled
+  // The embedder bug this option exists for: Haijun Code wraps an assembled
   // `source <snapshot> ... && eval '<cmd>'` string but looks violations up by
   // the raw `<cmd>`, so the stored key (first 100 chars of boilerplate) never
   // equalled the lookup key and no <sandbox_violations> block was produced.

@@ -190,8 +190,7 @@ mod tests {
         let bytes = encode_cmd(&s).unwrap();
         assert_eq!(
             u32::from_le_bytes(bytes[..4].try_into().unwrap()) as usize,
-            bytes.len() - 4
-        );
+            bytes.len() - 4 );
         let back: RunnerCmd = serde_json::from_slice(&bytes[4..]).unwrap();
         match back {
             RunnerCmd::Exec(r) => {

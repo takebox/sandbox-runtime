@@ -314,7 +314,7 @@ describe.if(isLinux)('Deny binds under a read-only denied directory', () => {
     // that holds PROJ and everything else uncreatable.
     expect(countMounts(command, '--ro-bind', '/', '/')).toBe(2)
     expect(command).not.toContain(`/dev/null ${PROJ}/`)
-    expect(command).not.toMatch(/--ro-bind \S*claude-empty-\S+ \S*\/proj\//)
+    expect(command).not.toMatch(/--ro-bind \S*haijun-empty-\S+ \S*\/proj\//)
   })
 
   it('re-applies a read-deny mask and tmpfs shadowed by a bind of "/" alone', async () => {
@@ -822,21 +822,21 @@ describe.if(isLinux)('Deny binds under a read-only denied directory', () => {
     const SECRET = 'REAL-PRIVATE-KEY'
     const SENTINEL = 'SENTINEL-NOT-A-KEY'
 
-    let DOT: string // the real directory PROJ/.claude points into
+    let DOT: string // the real directory PROJ/.haijun points into
     let REAL: string // the masked file, canonically
-    let VIA_LINK: string // the same file, spelled through PROJ/.claude
+    let VIA_LINK: string // the same file, spelled through PROJ/.haijun
     let STORE: string
     let FAKE: string
 
     beforeEach(() => {
-      DOT = join(AREA, 'dotfiles', 'claude')
+      DOT = join(AREA, 'dotfiles', 'haijun')
       mkdirSync(DOT, { recursive: true })
       REAL = join(DOT, 'secrets.json')
       writeFileSync(REAL, SECRET + '\n')
       // Relative target: an absolute one resolves outside the not-yet-pivoted
       // root and bwrap aborts on the mask's own bind, before any of this.
-      symlinkSync(join('..', 'dotfiles', 'claude'), join(PROJ, '.claude'))
-      VIA_LINK = join(PROJ, '.claude', 'secrets.json')
+      symlinkSync(join('..', 'dotfiles', 'haijun'), join(PROJ, '.haijun'))
+      VIA_LINK = join(PROJ, '.haijun', 'secrets.json')
       STORE = join(BASE, 'store')
       mkdirSync(STORE)
       FAKE = join(STORE, 'secrets.json.fake')
@@ -1065,7 +1065,7 @@ describe.if(isLinux)('Deny binds under a read-only denied directory', () => {
       expect(countMounts(rootDeniedWhole, '--ro-bind', '/dev/null', mcp)).toBe(
         0,
       )
-      expect(rootDeniedWhole).not.toContain('claude-empty-')
+      expect(rootDeniedWhole).not.toContain('haijun-empty-')
 
       // A second allow entry vetoes '/' — it lies strictly beneath it — and
       // so does a single read-deny directory, the re-application's trigger.

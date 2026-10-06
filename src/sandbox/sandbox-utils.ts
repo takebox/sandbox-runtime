@@ -34,8 +34,8 @@ export const DANGEROUS_DIRECTORIES = ['.git', '.vscode', '.idea'] as const
 export function getDangerousDirectories(): string[] {
   return [
     ...DANGEROUS_DIRECTORIES.filter(d => d !== '.git'),
-    '.claude/commands',
-    '.claude/agents',
+    '.haijun/commands',
+    '.haijun/agents',
   ]
 }
 
@@ -220,31 +220,27 @@ export function isSymlinkOutsideBoundary(
 
   // Handle macOS /tmp -> /private/tmp canonical resolution
   // This is a legitimate system symlink that should be allowed
-  // /tmp/claude -> /private/tmp/claude is OK
+  // /tmp/haijun -> /private/tmp/haijun is OK
   // /var/folders/... -> /private/var/folders/... is OK
   if (
     normalizedOriginal.startsWith('/tmp/') &&
-    normalizedResolved === '/private' + normalizedOriginal
-  ) {
+    normalizedResolved === '/private' + normalizedOriginal ) {
     return false
   }
   if (
     normalizedOriginal.startsWith('/var/') &&
-    normalizedResolved === '/private' + normalizedOriginal
-  ) {
+    normalizedResolved === '/private' + normalizedOriginal ) {
     return false
   }
   // Also handle the reverse: /private/tmp/... resolving to itself
   if (
     normalizedOriginal.startsWith('/private/tmp/') &&
-    normalizedResolved === normalizedOriginal
-  ) {
+    normalizedResolved === normalizedOriginal ) {
     return false
   }
   if (
     normalizedOriginal.startsWith('/private/var/') &&
-    normalizedResolved === normalizedOriginal
-  ) {
+    normalizedResolved === normalizedOriginal ) {
     return false
   }
 
@@ -261,13 +257,13 @@ export function isSymlinkOutsideBoundary(
   }
 
   // If original path starts with resolved path, the resolved path is an ancestor
-  // e.g., /tmp/claude -> /tmp means the symlink points to a broader scope
+  // e.g., /tmp/haijun -> /tmp means the symlink points to a broader scope
   if (normalizedOriginal.startsWith(normalizedResolved + '/')) {
     return true
   }
 
   // Also check the canonical form of the original path for macOS
-  // e.g., /tmp/claude should also be checked as /private/tmp/claude
+  // e.g., /tmp/haijun should also be checked as /private/tmp/haijun
   let canonicalOriginal = normalizedOriginal
   if (normalizedOriginal.startsWith('/tmp/')) {
     canonicalOriginal = '/private' + normalizedOriginal
@@ -287,7 +283,7 @@ export function isSymlinkOutsideBoundary(
   // 1. Start with the original path (deeper/same) - already covered by returning false below
   // 2. Start with the canonical original (deeper/same under canonical form)
   // 3. BE the canonical form of the original (e.g., /tmp/x -> /private/tmp/x)
-  // Any other resolution (e.g., /tmp/claude -> /Users/dworken) is outside expected bounds
+  // Any other resolution (e.g., /tmp/haijun -> /Users/dworken) is outside expected bounds
 
   const resolvedStartsWithOriginal = normalizedResolved.startsWith(
     normalizedOriginal + '/',
@@ -305,8 +301,7 @@ export function isSymlinkOutsideBoundary(
     !resolvedIsSame &&
     !resolvedIsCanonical &&
     !resolvedStartsWithOriginal &&
-    !resolvedStartsWithCanonical
-  ) {
+    !resolvedStartsWithCanonical ) {
     return true
   }
 
@@ -494,10 +489,10 @@ export function getDefaultWritePaths(): string[] {
     '/dev/tty',
     '/dev/dtracehelper',
     '/dev/autofs_nowait',
-    '/tmp/claude',
-    '/private/tmp/claude',
+    '/tmp/haijun',
+    '/private/tmp/haijun',
     path.join(homeDir, '.npm/_logs'),
-    path.join(homeDir, '.claude/debug'),
+    path.join(homeDir, '.haijun/debug'),
   ]
 
   return recommendedPaths
@@ -554,14 +549,14 @@ export function generateProxyEnvVars(
   // TMPDIR is overridden so temp-file writers land in a path the FS sandbox
   // allows (getDefaultWritePaths). When filesystem policy is disabled
   // (writeConfig === undefined → skipTmpdir), the host TMPDIR is already
-  // writable and /tmp/claude may not exist, so leave it untouched.
-  // CLAUDE_CODE_TMPDIR is the current name; CLAUDE_TMPDIR is kept for
+  // writable and /tmp/haijun may not exist, so leave it untouched.
+  // HAIJUN_CODE_TMPDIR is the current name; HAIJUN_TMPDIR is kept for
   // backwards compatibility (#141).
   if (!skipTmpdir) {
     const tmpdir =
-      process.env.CLAUDE_CODE_TMPDIR ||
-      process.env.CLAUDE_TMPDIR ||
-      '/tmp/claude'
+      process.env.HAIJUN_CODE_TMPDIR ||
+      process.env.HAIJUN_TMPDIR ||
+      '/tmp/haijun'
     envVars.push(`TMPDIR=${tmpdir}`)
   }
 

@@ -333,7 +333,7 @@ describe.if(!isWindows)('macOS profile: trailing unlink re-deny', () => {
   it('carves the allows and write roots a region glob covers (#171 shape)', () => {
     const profile = wrap(
       { denyOnly: ['/Users/me/**/*'], allowWithinDeny: ['/Users/me/proj'] },
-      ['/Users/me/proj', '/Users/me/.cache', '/private/tmp/claude'],
+      ['/Users/me/proj', '/Users/me/.cache', '/private/tmp/haijun'],
     )
     const rule = trailingUnlinkRule(profile)
     // proj is both an allow and a write root — carved once. .cache is only
@@ -344,7 +344,7 @@ describe.if(!isWindows)('macOS profile: trailing unlink re-deny', () => {
         ' (require-not (subpath "/Users/me/proj"))' +
         ' (require-not (subpath "/Users/me/.cache")))',
     )
-    expect(rule).not.toContain('/private/tmp/claude')
+    expect(rule).not.toContain('/private/tmp/haijun')
   })
 
   it('skips globs whose region is disjoint from every write root', () => {

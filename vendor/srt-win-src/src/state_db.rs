@@ -78,8 +78,7 @@ const SESSION_SCHEMA_SQL: &str = r#"
 CREATE TABLE IF NOT EXISTS brokers (
   pid                 INTEGER PRIMARY KEY,
   process_create_time INTEGER NOT NULL,
-  started_at          INTEGER NOT NULL
-);
+  started_at          INTEGER NOT NULL );
 -- Additive explicit ACEs for the sandbox user. kind ∈
 -- {'grant','deny','deny_fdc'}: `acl grant` writes ALLOW rows,
 -- `acl stamp` writes DENY rows on the target plus a `deny_fdc`
@@ -119,8 +118,7 @@ CREATE INDEX IF NOT EXISTS ace_holders_by_pid ON ace_holders (pid);
 -- creating holder would strip intermediates the later holder
 -- depends on.
 CREATE TABLE IF NOT EXISTS placeholders (
-  canonical_path TEXT PRIMARY KEY
-);
+  canonical_path TEXT PRIMARY KEY );
 "#;
 
 /// Outcome of a crash-recovery pass.
@@ -636,8 +634,7 @@ impl Locked {
                         "srt-win: WARNING: rollback {} '{}': {e:#}; \
                          ACE left in place",
                         w.ace.kind(),
-                        w.canon
-                    );
+                        w.canon );
                 }
             }
             if self

@@ -112,8 +112,7 @@ impl std::fmt::Display for WfpAccessDenied {
         write!(
             f,
             "{}: 0x{:08x} (BFE filter enumeration is admin-only)",
-            self.call, self.rc
-        )
+            self.call, self.rc )
     }
 }
 impl std::error::Error for WfpAccessDenied {}
@@ -747,8 +746,7 @@ pub fn parse_port_range(s: &str) -> Result<(u16, u16)> {
         return Err(anyhow!(
             "range too wide ({} ports); max width {}",
             hi - lo + 1,
-            MAX_PROXY_PORT_RANGE_WIDTH + 1
-        ));
+            MAX_PROXY_PORT_RANGE_WIDTH + 1 ));
     }
     Ok((lo, hi))
 }

@@ -226,8 +226,7 @@ export function createHttpProxyServer(options: HttpProxyServerOptions): Server {
     socket.on('error', () => {})
     if (
       (err as NodeJS.ErrnoException).code !== 'ECONNRESET' &&
-      socket.writable
-    ) {
+      socket.writable ) {
       // Destroy only after the flush: destroying immediately races the
       // write and can reset the connection before the 400 reaches the
       // client, while end() alone can leave a half-open socket from a
@@ -396,8 +395,7 @@ export function createHttpProxyServer(options: HttpProxyServerOptions): Server {
         clientGone ||
         socket.destroyed ||
         socket.readableEnded ||
-        !socket.writable
-      ) {
+        !socket.writable ) {
         logForDebugging(
           'CONNECT client gone before status write; dropping verdict and destroying socket',
         )
@@ -655,8 +653,7 @@ export function createHttpProxyServer(options: HttpProxyServerOptions): Server {
       if (
         options.mitmCA &&
         req.method === 'GET' &&
-        new URL(req.url ?? '', 'http://x').pathname === CRL_PATH
-      ) {
+        new URL(req.url ?? '', 'http://x').pathname === CRL_PATH ) {
         res.writeHead(200, {
           'Content-Type': 'application/pkix-crl',
           'Content-Length': options.mitmCA.crlDer.length,
@@ -776,8 +773,7 @@ export function createHttpProxyServer(options: HttpProxyServerOptions): Server {
           (req.destroyed && !req.readableEnded) ||
           res.destroyed ||
           req.socket.destroyed ||
-          body.destroyed
-        ) {
+          body.destroyed ) {
           body.destroy()
           return
         }
@@ -795,8 +791,7 @@ export function createHttpProxyServer(options: HttpProxyServerOptions): Server {
       if (
         clientDeclaredBody &&
         fwdHeaders['content-length'] === undefined &&
-        fwdHeaders['transfer-encoding'] === undefined
-      ) {
+        fwdHeaders['transfer-encoding'] === undefined ) {
         fwdHeaders['transfer-encoding'] = 'chunked'
       }
 

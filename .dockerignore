@@ -1,2 +1,2 @@
-# Exclude local Claude settings to avoid conflicts in tests
-.claude/settings.local.json
+# Exclude local Haijun settings to avoid conflicts in tests
+.haijun/settings.local.json

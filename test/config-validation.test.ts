@@ -283,7 +283,7 @@ describe('Config Validation', () => {
         denyWrite: [],
       },
       ripgrep: {
-        command: 'claude',
+        command: 'haijun',
         args: ['--ripgrep'],
       },
     }
@@ -291,7 +291,7 @@ describe('Config Validation', () => {
     const result = SandboxRuntimeConfigSchema.safeParse(config)
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.ripgrep?.command).toBe('claude')
+      expect(result.data.ripgrep?.command).toBe('haijun')
       expect(result.data.ripgrep?.args).toEqual(['--ripgrep'])
     }
   })

@@ -74,8 +74,7 @@ class BodyTooLargeError extends Error {}
  */
 export function looksLikeClientHello(buf: Buffer): boolean {
   return (
-    buf.length >= 3 && buf[0] === 0x16 && buf[1] === 0x03 && buf[2]! <= 0x03
-  )
+    buf.length >= 3 && buf[0] === 0x16 && buf[1] === 0x03 && buf[2]! <= 0x03 )
 }
 
 /**
@@ -391,8 +390,7 @@ async function forwardUpstream(
       (req.destroyed && !req.readableEnded) ||
       res.destroyed ||
       req.socket.destroyed ||
-      body.destroyed
-    ) {
+      body.destroyed ) {
       body.destroy()
       return
     }
@@ -515,8 +513,7 @@ async function forwardUpstream(
     clientDeclaredBody &&
     bufferedBody === undefined &&
     fwdHeaders['content-length'] === undefined &&
-    fwdHeaders['transfer-encoding'] === undefined
-  ) {
+    fwdHeaders['transfer-encoding'] === undefined ) {
     fwdHeaders['transfer-encoding'] = 'chunked'
   }
 

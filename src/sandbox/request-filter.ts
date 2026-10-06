@@ -221,8 +221,7 @@ export function rawDenied(reason: string, tag = DEFAULT_DENY_TAG): string {
     'Content-Type: text/plain\r\n' +
     `X-Proxy-Error: ${tag}\r\n` +
     '\r\n' +
-    reason
-  )
+    reason )
 }
 
 /**

@@ -1,4 +1,4 @@
-# Anthropic Sandbox Runtime (srt)
+# Takebox AI Sandbox Runtime (srt)
 
 A lightweight sandboxing tool for enforcing filesystem and network restrictions on arbitrary processes at the OS level, without requiring a container.
 
@@ -6,20 +6,20 @@ A lightweight sandboxing tool for enforcing filesystem and network restrictions 
 
 > **Beta Research Preview**
 >
-> The Sandbox Runtime is a research preview developed for [Claude Code](https://www.claude.com/product/claude-code) to enable safer AI agents. It's being made available as an early open source preview to help the broader ecosystem build more secure agentic systems. As this is an early research preview, APIs and configuration formats may evolve. We welcome feedback and contributions to make AI agents safer by default!
+> The Sandbox Runtime is a research preview developed for [Haijun Code]() to enable safer AI agents. It's being made available as an early open source preview to help the broader ecosystem build more secure agentic systems. As this is an early research preview, APIs and configuration formats may evolve. We welcome feedback and contributions to make AI agents safer by default!
 
 ## Installation
 
 ```bash
-npm install -g @anthropic-ai/sandbox-runtime
+npm install -g @takebox-ai/sandbox-runtime
 ```
 
 ## Basic Usage
 
 ```bash
 # Network restrictions
-$ srt "curl anthropic.com"
-Running: curl anthropic.com
+$ srt "curl Takebox AI.com"
+Running: curl Takebox AI.com
 <html>...</html>  # Request succeeds
 
 $ srt "curl example.com"
@@ -29,7 +29,7 @@ Connection blocked by network allowlist  # Request blocked
 # Filesystem restrictions
 $ srt "cat README.md"
 Running: cat README.md
-# Anthropic Sandb...  # Current directory access allowed
+# Takebox AI Sandb...  # Current directory access allowed
 
 $ srt "cat ~/.ssh/id_rsa"
 Running: cat ~/.ssh/id_rsa
@@ -129,10 +129,10 @@ Both filesystem and network isolation are required for effective sandboxing. Wit
 
 Both HTTP/HTTPS (via HTTP proxy) and other TCP traffic (via SOCKS5 proxy) are mediated by these proxies, which enforce your domain allowlists and denylists.
 
-For more details on sandboxing in Claude Code, see:
+For more details on sandboxing in Haijun Code, see:
 
-- [Claude Code Sandboxing Documentation](https://docs.claude.com/en/docs/claude-code/sandboxing)
-- [Beyond Permission Prompts: Making Claude Code More Secure and Autonomous](https://www.anthropic.com/engineering/claude-code-sandboxing)
+- [Haijun Code Sandboxing Documentation](https://raw.haijun.my.id/docs/en/sandboxing)
+- [Beyond Permission Prompts: Making Haijun Code More Secure and Autonomous]()
 
 ## Architecture
 
@@ -161,7 +161,7 @@ src/
 
 ### As a CLI tool
 
-The `srt` command (Anthropic Sandbox Runtime) wraps any command with security boundaries:
+The `srt` command (Takebox AI Sandbox Runtime) wraps any command with security boundaries:
 
 ```bash
 # Run a command in the sandbox
@@ -180,7 +180,7 @@ srt --settings /path/to/srt-settings.json npm install
 import {
   SandboxManager,
   type SandboxRuntimeConfig,
-} from '@anthropic-ai/sandbox-runtime'
+} from '@takebox-ai/sandbox-runtime'
 import { spawn } from 'child_process'
 
 // Define your sandbox configuration
@@ -238,10 +238,10 @@ const annotated = SandboxManager.annotateStderrWithSandboxFailures(
 
 ```typescript
 // Main sandbox manager
-export { SandboxManager } from '@anthropic-ai/sandbox-runtime'
+export { SandboxManager } from '@takebox-ai/sandbox-runtime'
 
 // Violation tracking
-export { SandboxViolationStore } from '@anthropic-ai/sandbox-runtime'
+export { SandboxViolationStore } from '@takebox-ai/sandbox-runtime'
 
 // TypeScript types
 export type {
@@ -253,7 +253,7 @@ export type {
   FsReadRestrictionConfig,
   FsWriteRestrictionConfig,
   NetworkRestrictionConfig,
-} from '@anthropic-ai/sandbox-runtime'
+} from '@takebox-ai/sandbox-runtime'
 ```
 
 ## Configuration
@@ -548,7 +548,7 @@ Windows support is **alpha**. The sandboxed process runs under a dedicated `srt-
 Run once per machine (self-elevates; one UAC prompt):
 
 ```powershell
-npx @anthropic-ai/sandbox-runtime windows-install
+npx @takebox-ai/sandbox-runtime windows-install
 ```
 
 This provisions the `srt-sandbox` local user account (with a random password stored DPAPI-encrypted in `HKLM\SOFTWARE\sandbox-runtime` — machine-wide, so fleet installs running as SYSTEM work and one user's rotation updates the copy the others read), the `sandbox-runtime-users` local group, and installs a machine-wide WFP filter set keyed on the `srt-sandbox` SID. It is **idempotent** — re-running it rotates the sandbox account's password and reconciles the filter set.
@@ -580,7 +580,7 @@ Running under a distinct user SID structurally closes the surrogate-spawn class 
 `network.tlsTerminate` requires the MITM CA to be present in the **sandbox user's** `CurrentUser\Root` certificate store (schannel — the TLS backend used by `System32\curl.exe`, PowerShell `Invoke-WebRequest`, .NET, and default-backend `git` — trusts only the OS store, not environment variables). This is an install-time step, separate from `windows-install`:
 
 ```typescript
-import { windowsTrustCa } from '@anthropic-ai/sandbox-runtime'
+import { windowsTrustCa } from '@takebox-ai/sandbox-runtime'
 windowsTrustCa('/path/to/mitm-ca.crt') // or: srt-win user trust-ca <path>
 ```
 
@@ -607,7 +607,7 @@ The cross-platform `filesystem` and `network` blocks apply as described above. W
 ### Uninstall
 
 ```powershell
-npx @anthropic-ai/sandbox-runtime windows-uninstall
+npx @takebox-ai/sandbox-runtime windows-uninstall
 ```
 
 Removes the WFP filter set, the `srt-sandbox` account and its profile, the `sandbox-runtime-users` group, and removes the `HKLM\SOFTWARE\sandbox-runtime` key (credential, marker, CA record) — one UAC prompt. `%ProgramData%\sandbox-runtime` (the CA key material) is left in place; delete it (and `%LOCALAPPDATA%\sandbox-runtime` per user) manually for a full sweep.
@@ -712,7 +712,7 @@ Certain sensitive files and directories are **always blocked from writes**, even
 **Always-blocked directories:**
 
 - IDE directories: `.vscode/`, `.idea/`
-- Claude config directories: `.claude/commands/`, `.claude/agents/`
+- Haijun config directories: `.haijun/commands/`, `.haijun/agents/`
 - Git hooks and config: `.git/hooks/`, `.git/config`
 
 These paths are blocked automatically - you don't need to add them to `denyWrite`. For example, even with `allowWrite: ["."]`, writing to `.bashrc` or `.git/hooks/pre-commit` will fail:
@@ -783,9 +783,9 @@ When a sandboxed process attempts to access a restricted resource:
 
 1. **Blocks the operation** at the OS level (returns `EPERM` error)
 2. **Logs the violation** (platform-specific mechanisms)
-3. **Notifies the user** (in Claude Code, this triggers a permission prompt)
+3. **Notifies the user** (in Haijun Code, this triggers a permission prompt)
 
-**macOS**: The sandbox runtime taps into macOS's system sandbox violation log store. This provides real-time notifications with detailed information about what was attempted and why it was blocked. This is the same mechanism Claude Code uses for violation detection.
+**macOS**: The sandbox runtime taps into macOS's system sandbox violation log store. This provides real-time notifications with detailed information about what was attempted and why it was blocked. This is the same mechanism Haijun Code uses for violation detection.
 
 ```bash
 # View sandbox violations in real-time

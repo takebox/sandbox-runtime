@@ -391,8 +391,7 @@ fn diag_2245(op: &str, attempt: usize, password: &str) {
     eprintln!(
         "srt-win: {op} 2245 (attempt {}/{MAX_PW_ATTEMPTS}) — policy: min_len={min_len} hist={hist}; \
          pw classes: U={u} L={l} D={d} S={s}; retrying",
-        attempt + 1
-    );
+        attempt + 1 );
 }
 
 fn ensure_dont_expire(name: &str, name_w: &[u16]) -> Result<()> {

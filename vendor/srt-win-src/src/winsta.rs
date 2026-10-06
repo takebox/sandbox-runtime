@@ -357,8 +357,7 @@ fn open_session_bno() -> Result<OwnedHandle> {
         return Err(anyhow!(
             "NtOpenDirectoryObject({path}, READ_CONTROL|WRITE_DAC): \
              NTSTATUS 0x{:08X}{why}",
-            st.0
-        ));
+            st.0 ));
     }
     Ok(OwnedHandle(h))
 }

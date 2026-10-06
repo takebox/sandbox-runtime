@@ -84,15 +84,15 @@ describe.if(isSupportedPlatform)(
       mkdirSync(join(TEST_DIR, '.idea'), { recursive: true })
       writeFileSync(join(TEST_DIR, '.idea', 'workspace.xml'), ORIGINAL_CONTENT)
 
-      // Create .claude/commands and .claude/agents (should be blocked)
-      mkdirSync(join(TEST_DIR, '.claude', 'commands'), { recursive: true })
-      mkdirSync(join(TEST_DIR, '.claude', 'agents'), { recursive: true })
+      // Create .haijun/commands and .haijun/agents (should be blocked)
+      mkdirSync(join(TEST_DIR, '.haijun', 'commands'), { recursive: true })
+      mkdirSync(join(TEST_DIR, '.haijun', 'agents'), { recursive: true })
       writeFileSync(
-        join(TEST_DIR, '.claude', 'commands', 'test.md'),
+        join(TEST_DIR, '.haijun', 'commands', 'test.md'),
         ORIGINAL_CONTENT,
       )
       writeFileSync(
-        join(TEST_DIR, '.claude', 'agents', 'test-agent.md'),
+        join(TEST_DIR, '.haijun', 'agents', 'test-agent.md'),
         ORIGINAL_CONTENT,
       )
 
@@ -112,9 +112,9 @@ describe.if(isSupportedPlatform)(
       )
       writeFileSync(join(TEST_DIR, '.git', 'index'), ORIGINAL_CONTENT)
 
-      // Create safe file within .claude that SHOULD be writable (not commands/agents)
+      // Create safe file within .haijun that SHOULD be writable (not commands/agents)
       writeFileSync(
-        join(TEST_DIR, '.claude', 'some-other-file.txt'),
+        join(TEST_DIR, '.haijun', 'some-other-file.txt'),
         ORIGINAL_CONTENT,
       )
     })
@@ -280,26 +280,26 @@ describe.if(isSupportedPlatform)(
         )
       })
 
-      it('blocks writes to .claude/commands/', async () => {
+      it('blocks writes to .haijun/commands/', async () => {
         const result = await runSandboxedWrite(
-          '.claude/commands/test.md',
+          '.haijun/commands/test.md',
           MODIFIED_CONTENT,
         )
 
         expect(result.success).toBe(false)
-        expect(readFileSync('.claude/commands/test.md', 'utf8')).toBe(
+        expect(readFileSync('.haijun/commands/test.md', 'utf8')).toBe(
           ORIGINAL_CONTENT,
         )
       })
 
-      it('blocks writes to .claude/agents/', async () => {
+      it('blocks writes to .haijun/agents/', async () => {
         const result = await runSandboxedWrite(
-          '.claude/agents/test-agent.md',
+          '.haijun/agents/test-agent.md',
           MODIFIED_CONTENT,
         )
 
         expect(result.success).toBe(false)
-        expect(readFileSync('.claude/agents/test-agent.md', 'utf8')).toBe(
+        expect(readFileSync('.haijun/agents/test-agent.md', 'utf8')).toBe(
           ORIGINAL_CONTENT,
         )
       })
@@ -361,14 +361,14 @@ describe.if(isSupportedPlatform)(
         expect(readFileSync('.git/index', 'utf8').trim()).toBe(MODIFIED_CONTENT)
       })
 
-      it('allows writes to .claude/ files outside commands/agents', async () => {
+      it('allows writes to .haijun/ files outside commands/agents', async () => {
         const result = await runSandboxedWrite(
-          '.claude/some-other-file.txt',
+          '.haijun/some-other-file.txt',
           MODIFIED_CONTENT,
         )
 
         expect(result.success).toBe(true)
-        expect(readFileSync('.claude/some-other-file.txt', 'utf8').trim()).toBe(
+        expect(readFileSync('.haijun/some-other-file.txt', 'utf8').trim()).toBe(
           MODIFIED_CONTENT,
         )
       })
@@ -517,9 +517,9 @@ describe.if(isSupportedPlatform)(
         // --- Security: deny path blocking ---
 
         it('blocks creation of non-existent file when parent dir exists', async () => {
-          // .claude directory exists from beforeAll setup
-          // .claude/settings.json does NOT exist
-          const nonExistentFile = '.claude/settings.json'
+          // .haijun directory exists from beforeAll setup
+          // .haijun/settings.json does NOT exist
+          const nonExistentFile = '.haijun/settings.json'
 
           const result = await runSandboxedWriteWithDenyPaths(
             `echo '{"hooks":{}}' > '${nonExistentFile}'`,
@@ -657,13 +657,13 @@ describe.if(isSupportedPlatform)(
         it('defers mount point cleanup while another sandbox is still running', async () => {
           const raceDir = join(TEST_DIR, 'race-test')
           mkdirSync(raceDir, { recursive: true })
-          mkdirSync(join(raceDir, '.claude'), { recursive: true })
+          mkdirSync(join(raceDir, '.haijun'), { recursive: true })
 
           const originalDir = process.cwd()
           process.chdir(raceDir)
 
           try {
-            const protectedFile = join(raceDir, '.claude', 'settings.json')
+            const protectedFile = join(raceDir, '.haijun', 'settings.json')
             const writeConfig = {
               allowOnly: ['.'],
               denyWithinAllow: [protectedFile],
@@ -674,7 +674,7 @@ describe.if(isSupportedPlatform)(
             // allowAllUnixSockets skips seccomp (environment-dependent) while
             // keeping the filesystem isolation we're testing.
             const wrappedA = await wrapCommandWithSandboxLinux({
-              command: `sleep 2; echo '{"hooks":{}}' > .claude/settings.json`,
+              command: `sleep 2; echo '{"hooks":{}}' > .haijun/settings.json`,
               needsNetworkRestriction: false,
               readConfig: undefined,
               writeConfig,
@@ -733,13 +733,13 @@ describe.if(isSupportedPlatform)(
         it('defers cleanup when two sandboxes share the same non-existent deny path', async () => {
           const raceDir = join(TEST_DIR, 'race-test-2')
           mkdirSync(raceDir, { recursive: true })
-          mkdirSync(join(raceDir, '.claude'), { recursive: true })
+          mkdirSync(join(raceDir, '.haijun'), { recursive: true })
 
           const originalDir = process.cwd()
           process.chdir(raceDir)
 
           try {
-            const protectedFile = join(raceDir, '.claude', 'settings.json')
+            const protectedFile = join(raceDir, '.haijun', 'settings.json')
             const writeConfig = {
               allowOnly: ['.'],
               denyWithinAllow: [protectedFile],
@@ -748,7 +748,7 @@ describe.if(isSupportedPlatform)(
             // Generate both wrapped commands BEFORE spawning, so both see the
             // deny path as non-existent and both add it to bwrapMountPoints.
             const wrappedA = await wrapCommandWithSandboxLinux({
-              command: `sleep 2; echo WRITTEN > .claude/settings.json`,
+              command: `sleep 2; echo WRITTEN > .haijun/settings.json`,
               needsNetworkRestriction: false,
               readConfig: undefined,
               writeConfig,
@@ -794,13 +794,13 @@ describe.if(isSupportedPlatform)(
         it('deferred cleanup runs once all concurrent sandboxes finish', async () => {
           const raceDir = join(TEST_DIR, 'race-test-3')
           mkdirSync(raceDir, { recursive: true })
-          mkdirSync(join(raceDir, '.claude'), { recursive: true })
+          mkdirSync(join(raceDir, '.haijun'), { recursive: true })
 
           const originalDir = process.cwd()
           process.chdir(raceDir)
 
           try {
-            const protectedFile = join(raceDir, '.claude', 'settings.json')
+            const protectedFile = join(raceDir, '.haijun', 'settings.json')
             const writeConfig = {
               allowOnly: ['.'],
               denyWithinAllow: [protectedFile],
@@ -992,7 +992,7 @@ describe.if(isSupportedPlatform)(
               timeout: 10000,
             })
 
-            // Run cleanup (as the CLI / Claude Code would)
+            // Run cleanup (as the CLI / Haijun Code would)
             cleanupBwrapMountPoints()
 
             // Verify no ghost dotfiles were left behind
@@ -1052,20 +1052,20 @@ describe.if(isSupportedPlatform)(
         // a directory symlink is canonicalized and the deny applied to the
         // resolved target (resolve-before-mask). Masking the raw symlink
         // with /dev/null instead made bwrap abort at startup, failing every
-        // sandboxed command whenever .claude was a symlink. The guarantees
+        // sandboxed command whenever .haijun was a symlink. The guarantees
         // around a deny path whose parent stays writable are unchanged from
         // the non-symlink case.
-        it('denies writes through a symlinked .claude directory', async () => {
-          // Setup: Create a symlink .claude -> decoy (simulating malicious git repo)
+        it('denies writes through a symlinked .haijun directory', async () => {
+          // Setup: Create a symlink .haijun -> decoy (simulating malicious git repo)
           const decoyDir = 'symlink-decoy'
-          const claudeSymlink = 'symlink-claude'
+          const haijunSymlink = 'symlink-haijun'
           mkdirSync(decoyDir, { recursive: true })
           writeFileSync(join(decoyDir, 'settings.json'), '{}')
-          symlinkSync(decoyDir, claudeSymlink)
+          symlinkSync(decoyDir, haijunSymlink)
 
           try {
             // The deny path is the settings.json through the symlink
-            const denyPath = join(TEST_DIR, claudeSymlink, 'settings.json')
+            const denyPath = join(TEST_DIR, haijunSymlink, 'settings.json')
 
             // The sandbox must start despite the directory symlink in the
             // deny path (bwrap used to abort on the /dev/null symlink mask).
@@ -1077,7 +1077,7 @@ describe.if(isSupportedPlatform)(
             // Writing through the symlink must fail: the deny lands on the
             // resolved target, the inode the write actually reaches.
             const result = await runSandboxedCommandWithDenyPaths(
-              `echo '{"hooks":{}}' > ${claudeSymlink}/settings.json`,
+              `echo '{"hooks":{}}' > ${haijunSymlink}/settings.json`,
               [denyPath],
             )
             expect(result.success).toBe(false)
@@ -1086,7 +1086,7 @@ describe.if(isSupportedPlatform)(
             )
           } finally {
             // Cleanup
-            rmSync(claudeSymlink, { force: true })
+            rmSync(haijunSymlink, { force: true })
             rmSync(decoyDir, { recursive: true, force: true })
           }
         })

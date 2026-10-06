@@ -155,8 +155,7 @@ export function registerAwsPairs(
       akidSentinel === undefined ||
       !secretMasked ||
       realAkid === undefined ||
-      realSecret === undefined
-    ) {
+      realSecret === undefined ) {
       if (secretMasked && akidSentinel === undefined) {
         const msg =
           `[sandbox-runtime] WARNING: "${spec.secretAccessKeyVar}" is ` +
@@ -323,8 +322,7 @@ export function createSigv4Planner(
       if (name === 'host') continue
       if (
         name === 'x-amz-security-token' &&
-        pair.realSessionToken !== undefined
-      ) {
+        pair.realSessionToken !== undefined ) {
         continue
       }
       if (headers[name] === undefined) {
@@ -354,8 +352,7 @@ export function createSigv4Planner(
         }
         if (
           fwdHeaders['x-amz-content-sha256'] !== undefined &&
-          contentSha !== UNSIGNED_PAYLOAD
-        ) {
+          contentSha !== UNSIGNED_PAYLOAD ) {
           // The recomputed hash is authoritative: the signature must
           // cover the bytes forwarded upstream, not the client's claim.
           fwdHeaders['x-amz-content-sha256'] = payloadHash

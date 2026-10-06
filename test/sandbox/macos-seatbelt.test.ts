@@ -679,7 +679,7 @@ describe.if(isMacOS)(
     )
     const TEST_ALLOWED_DIR = join(TEST_BASE_DIR, 'allowed')
     // Protected directory that does NOT exist on disk
-    const TEST_DENIED_PARENT = join(TEST_ALLOWED_DIR, '.claude')
+    const TEST_DENIED_PARENT = join(TEST_ALLOWED_DIR, '.haijun')
     const TEST_DENIED_FILE = join(TEST_DENIED_PARENT, 'settings.json')
     const TEST_DECOY_DIR = join(TEST_ALLOWED_DIR, 'decoy')
 

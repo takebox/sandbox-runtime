@@ -667,8 +667,7 @@ function literalDenyGroupFilters(group: LiteralDenyGroup): {
     const nameLength = regexLength(name) + (chunk.length === 0 ? 0 : 1)
     if (
       chunk.length > 0 &&
-      fixedLength + chunkLength + nameLength > SBPL_STRING_MAX_BYTES
-    ) {
+      fixedLength + chunkLength + nameLength > SBPL_STRING_MAX_BYTES ) {
       chunks.push(chunk)
       chunk = []
       chunkLength = 0
@@ -1345,8 +1344,7 @@ export function wrapCommandWithSandboxMacOS(
     !hasReadRestrictions &&
     !hasWriteRestrictions &&
     !hasEnvRestrictions &&
-    !hasGitConfig
-  ) {
+    !hasGitConfig ) {
     return command
   }
 

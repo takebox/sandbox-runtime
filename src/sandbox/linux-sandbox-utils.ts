@@ -149,7 +149,7 @@ const MAX_SYMLINK_RESOLUTION_DEPTH = 40
 /**
  * Canonicalize a deny path through symlinks before any mask or bind is
  * computed (resolve-before-mask). Deny paths regularly contain symlinked
- * ancestors — the common dotfiles setup symlinks .claude (or the parent of
+ * ancestors — the common dotfiles setup symlinks .haijun (or the parent of
  * .mcp.json) to a real directory — and masking the raw symlink with
  * `--ro-bind /dev/null <symlink>` makes bwrap abort at startup: "Is a
  * directory" for relative link targets, ENOENT for absolute ones.
@@ -438,8 +438,7 @@ function ensureEmptyMountSourceDir(): string {
         stat.isDirectory() &&
         stat.uid === process.getuid?.() &&
         (stat.mode & 0o077) === 0 &&
-        fs.readdirSync(emptyMountSourceDir).length === 0
-      ) {
+        fs.readdirSync(emptyMountSourceDir).length === 0 ) {
         return emptyMountSourceDir
       }
     } catch {
@@ -449,7 +448,7 @@ function ensureEmptyMountSourceDir(): string {
       `[Sandbox Linux] Not reusing the empty-directory mount source, it is gone or no longer our own empty directory: ${emptyMountSourceDir}`,
     )
   }
-  emptyMountSourceDir = fs.mkdtempSync(path.join(tmpdir(), 'claude-empty-'))
+  emptyMountSourceDir = fs.mkdtempSync(path.join(tmpdir(), 'haijun-empty-'))
   // mkdtemp asks for 0700 but the umask applies, so under `umask 0200` the
   // directory lands on 0500. Set the mode here rather than let the check
   // above reject the directory this call has just made.
@@ -475,8 +474,7 @@ function isStaleBwrapMountPoint(p: string): boolean {
       stat.isFile() &&
       stat.size === 0 &&
       (stat.mode & 0o222) === 0 &&
-      stat.nlink === 1
-    )
+      stat.nlink === 1 )
   } catch {
     return false
   }
@@ -1074,8 +1072,7 @@ export function checkLinuxDependencies(
 
   if (
     !seccompConfig?.argv0 &&
-    getApplySeccompBinaryPath(seccompConfig?.applyPath) === null
-  ) {
+    getApplySeccompBinaryPath(seccompConfig?.applyPath) === null ) {
     warnings.push('seccomp not available - unix socket access not restricted')
   }
 
@@ -1186,10 +1183,10 @@ export async function initializeLinuxNetworkBridge(
 ): Promise<LinuxNetworkBridgeContext> {
   const socat = socatPath ?? 'socat'
   const socketId = randomBytes(8).toString('hex')
-  const httpSocketPath = join(tmpdir(), `claude-http-${socketId}.sock`)
+  const httpSocketPath = join(tmpdir(), `haijun-http-${socketId}.sock`)
   // Only allocated when ports differ; in the mux case the SOCKS side
   // reuses httpSocketPath.
-  const socksSocketPath = join(tmpdir(), `claude-socks-${socketId}.sock`)
+  const socksSocketPath = join(tmpdir(), `haijun-socks-${socketId}.sock`)
 
   // Start HTTP bridge
   const httpSocatArgs = [
@@ -1281,8 +1278,7 @@ export async function initializeLinuxNetworkBridge(
       !httpBridgeProcess.pid ||
       httpBridgeProcess.killed ||
       !socksBridgeProcess.pid ||
-      socksBridgeProcess.killed
-    ) {
+      socksBridgeProcess.killed ) {
       throw new Error('Linux bridge process died unexpectedly')
     }
 
@@ -2493,9 +2489,9 @@ async function generateFilesystemArgs(
           // One mount point per destination. Deny paths are deduplicated on
           // the deny path, but a placeholder lands on the first MISSING
           // component, so two denies sharing one arrive here with a single
-          // destination — denyWrite '<cwd>/.claude' together with the
-          // mandatory '<cwd>/.claude/commands', in a project with no
-          // `.claude/`. Two binds there make bwrap refuse to start when they
+          // destination — denyWrite '<cwd>/.haijun' together with the
+          // mandatory '<cwd>/.haijun/commands', in a project with no
+          // `.haijun/`. Two binds there make bwrap refuse to start when they
           // disagree about the destination's kind ("Can't mkdir <dest>: Not a
           // directory"). The directory form wins the disagreement: an empty
           // read-only directory blocks creating the destination and everything
@@ -3038,8 +3034,7 @@ export async function wrapCommandWithSandboxLinux(
     !hasReadRestrictions &&
     !hasWriteRestrictions &&
     !hasEnvRestrictions &&
-    !hasGitConfig
-  ) {
+    !hasGitConfig ) {
     return command
   }
 
@@ -3075,7 +3070,7 @@ export async function wrapCommandWithSandboxLinux(
       if (!applySeccompPrefix) {
         logForDebugging(
           '[Sandbox Linux] apply-seccomp binary not available - unix socket blocking disabled. ' +
-            'Install @anthropic-ai/sandbox-runtime globally for full protection.',
+            'Install @takebox-ai/sandbox-runtime globally for full protection.',
           { level: 'warn' },
         )
       } else {
@@ -3211,14 +3206,14 @@ export async function wrapCommandWithSandboxLinux(
         if (httpProxyPort !== undefined) {
           bwrapArgs.push(
             '--setenv',
-            'CLAUDE_CODE_HOST_HTTP_PROXY_PORT',
+            'HAIJUN_CODE_HOST_HTTP_PROXY_PORT',
             String(httpProxyPort),
           )
         }
         if (socksProxyPort !== undefined) {
           bwrapArgs.push(
             '--setenv',
-            'CLAUDE_CODE_HOST_SOCKS_PROXY_PORT',
+            'HAIJUN_CODE_HOST_SOCKS_PROXY_PORT',
             String(socksProxyPort),
           )
         }

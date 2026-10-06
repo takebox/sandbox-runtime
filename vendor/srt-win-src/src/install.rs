@@ -130,8 +130,7 @@ pub fn write_setup(u: &user::ProvisionedUser) -> Result<()> {
         .is_some_and(|old| old != u.username);
     let cred_sddl = format!(
         "O:BAD:P(D;;KA;;;{})(A;;KA;;;SY)(A;;KA;;;BA)(A;;KR;;;BU)",
-        u.group_sid
-    );
+        u.group_sid );
     let cred = crate::reg::ensure_key_with_dacl(crate::reg::CRED_SUBKEY, &cred_sddl)?;
     cred.set_binary("Blob", &blob)?;
     // Ca subkey: Users KEY_READ|KEY_SET_VALUE (0x2001b) so the
@@ -139,8 +138,7 @@ pub fn write_setup(u: &user::ProvisionedUser) -> Result<()> {
     // the CHILD cannot touch the record.
     let ca_sddl = format!(
         "O:BAD:P(D;;KA;;;{})(A;;KA;;;SY)(A;;KA;;;BA)(A;;0x2001b;;;BU)",
-        u.group_sid
-    );
+        u.group_sid );
     let ca = crate::reg::ensure_key_with_dacl(crate::reg::CA_SUBKEY, &ca_sddl)?;
     if name_changed {
         crate::reg::delete_value(&ca, "Der")?;

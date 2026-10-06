@@ -38,8 +38,7 @@ export function listenInRange(
         if (
           range &&
           (err as NodeJS.ErrnoException)?.code === 'EADDRINUSE' &&
-          port < hi
-        ) {
+          port < hi ) {
           port++
           tryNext()
           return

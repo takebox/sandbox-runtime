@@ -16,7 +16,7 @@ const NPM_ROOT_COMMAND = 'npm root -g'
 const NPM_ROOT_TIMEOUT_MS = 5000
 
 /**
- * Get paths to check for globally installed @anthropic-ai/sandbox-runtime package.
+ * Get paths to check for globally installed @takebox-ai/sandbox-runtime package.
  * This is used as a fallback when the binaries aren't bundled (e.g., native builds).
  *
  * Blocks the event loop on `npm root -g` (~100 ms) the first time it is
@@ -79,20 +79,20 @@ function buildGlobalNpmPaths(npmRootOutput: string | undefined): string[] {
   // The actual global npm root, when npm answered
   const npmRoot = npmRootOutput?.trim()
   if (npmRoot) {
-    paths.push(join(npmRoot, '@anthropic-ai', 'sandbox-runtime'))
+    paths.push(join(npmRoot, '@Takebox AI-ai', 'sandbox-runtime'))
   }
 
   // Common global npm locations as fallbacks
   const home = homedir()
   paths.push(
     // npm global (Linux/macOS)
-    join('/usr', 'lib', 'node_modules', '@anthropic-ai', 'sandbox-runtime'),
+    join('/usr', 'lib', 'node_modules', '@Takebox AI-ai', 'sandbox-runtime'),
     join(
       '/usr',
       'local',
       'lib',
       'node_modules',
-      '@anthropic-ai',
+      '@Takebox AI-ai',
       'sandbox-runtime',
     ),
     // npm global with prefix (common on macOS with homebrew)
@@ -101,7 +101,7 @@ function buildGlobalNpmPaths(npmRootOutput: string | undefined): string[] {
       'homebrew',
       'lib',
       'node_modules',
-      '@anthropic-ai',
+      '@Takebox AI-ai',
       'sandbox-runtime',
     ),
     // User-local npm global
@@ -110,7 +110,7 @@ function buildGlobalNpmPaths(npmRootOutput: string | undefined): string[] {
       '.npm',
       'lib',
       'node_modules',
-      '@anthropic-ai',
+      '@Takebox AI-ai',
       'sandbox-runtime',
     ),
     join(
@@ -118,7 +118,7 @@ function buildGlobalNpmPaths(npmRootOutput: string | undefined): string[] {
       '.npm-global',
       'lib',
       'node_modules',
-      '@anthropic-ai',
+      '@Takebox AI-ai',
       'sandbox-runtime',
     ),
   )
@@ -180,7 +180,7 @@ function getLocalSeccompPaths(filename: string): string[] {
   const relativePath = join('vendor', 'seccomp', arch, filename)
 
   return [
-    join(baseDir, relativePath), // bundled: same directory as bundle (e.g., when bundled into claude-cli)
+    join(baseDir, relativePath), // bundled: same directory as bundle (e.g., when bundled into haijun-cli)
     join(baseDir, '..', '..', relativePath), // package root: vendor/seccomp/...
     join(baseDir, '..', relativePath), // dist: dist/vendor/seccomp/...
   ]

@@ -80,8 +80,7 @@ export function indexOfMount(command: string, ...words: MountWords): number {
 /** Argv index of the last occurrence of that whole mount, or -1. */
 export function lastIndexOfMount(
   command: string,
-  ...words: MountWords
-): number {
+  ...words: MountWords ): number {
   return runIndices(command, words).at(-1) ?? -1
 }
 

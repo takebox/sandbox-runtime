@@ -1545,7 +1545,7 @@ describe.if(isLinux)(
         readConfig: { denyOnly: [join(proj, 'img', 'build')] },
         writeConfig: {
           allowOnly: [work],
-          denyWithinAllow: [proj, join(proj, '.claude', 'settings.json')],
+          denyWithinAllow: [proj, join(proj, '.haijun', 'settings.json')],
         },
         mandatoryDenySearchDepth: 1,
       })
@@ -1558,7 +1558,7 @@ describe.if(isLinux)(
       expect(
         wrapped
           .split(' --')
-          .filter(op => op.includes(` ${join(proj, '.claude')}`)),
+          .filter(op => op.includes(` ${join(proj, '.haijun')}`)),
       ).toEqual([])
     })
 
@@ -1575,7 +1575,7 @@ describe.if(isLinux)(
       expect(stdout).toContain('usr')
     })
 
-    // denyWrite [proj, proj/.claude/settings.json (absent)] + denyRead
+    // denyWrite [proj, proj/.haijun/settings.json (absent)] + denyRead
     // proj/**/build/**: collapsed, the pattern is a tmpfs beneath the
     // write-denied directory. The absent deny path is uncreatable under
     // proj's read-only bind either way, and a stub for it would have bwrap
@@ -1598,7 +1598,7 @@ describe.if(isLinux)(
           },
           writeConfig: {
             allowOnly: [work],
-            denyWithinAllow: [proj, join(proj, '.claude', 'settings.json')],
+            denyWithinAllow: [proj, join(proj, '.haijun', 'settings.json')],
           },
           mandatoryDenySearchDepth: 1,
         })
@@ -1613,12 +1613,12 @@ describe.if(isLinux)(
 
       const projBind = lastIndexOfMount(wrapped, '--ro-bind', proj, proj)
       expect(projBind).toBeGreaterThan(-1)
-      // No stub: nothing is mounted at or beneath proj/.claude.
+      // No stub: nothing is mounted at or beneath proj/.haijun.
       expect(
         wrapped
           .slice(0, wrapped.indexOf(' --dev '))
           .split(' --')
-          .filter(op => op.includes(` ${join(proj, '.claude')}`)),
+          .filter(op => op.includes(` ${join(proj, '.haijun')}`)),
       ).toEqual([])
       expect(
         lastIndexOfMount(wrapped, '--tmpfs', join(proj, 'pkg', 'build')),
@@ -1631,7 +1631,7 @@ describe.if(isLinux)(
         const proj = join(ROOT, 's14', 'work', 'proj')
         const stdout = runBooted(
           await wrapWriteDeniedCheckout(
-            `echo BOOTED; mkdir ${join(proj, '.claude')} || echo UNCREATABLE; cat ${join(proj, 'pkg', 'build', '1.out')} || echo HIDDEN`,
+            `echo BOOTED; mkdir ${join(proj, '.haijun')} || echo UNCREATABLE; cat ${join(proj, 'pkg', 'build', '1.out')} || echo HIDDEN`,
           ),
         )
         expect(stdout).toBe('BOOTED\nUNCREATABLE\nHIDDEN\n')

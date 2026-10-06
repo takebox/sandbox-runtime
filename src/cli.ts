@@ -226,8 +226,7 @@ async function main(): Promise<void> {
           // code making the choice, not a library default.
           if (
             process.platform === 'win32' &&
-            runtimeConfig.windows?.srtWin?.path === undefined
-          ) {
+            runtimeConfig.windows?.srtWin?.path === undefined ) {
             const { VENDORED_SRT_WIN_EXE } = await import(
               './sandbox/windows-sandbox-utils.js'
             )

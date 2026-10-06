@@ -94,8 +94,7 @@ export function resolveParentProxy(
       const parsed = new URL(withScheme)
       if (
         (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') ||
-        !parsed.hostname
-      ) {
+        !parsed.hostname ) {
         throw new Error('unsupported scheme or empty host')
       }
       return parsed

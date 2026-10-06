@@ -40,7 +40,7 @@ const USR_MERGED_ROOT_LINKS = readdirSync('/', { withFileTypes: true })
 /**
  * Regression tests for symlinked deny paths (resolve-before-mask).
  *
- * In the common dotfiles setup, .claude (or the parent of .mcp.json) is a
+ * In the common dotfiles setup, .haijun (or the parent of .mcp.json) is a
  * symlink to a real directory. Deny paths crossing such a symlink used to be
  * masked with `--ro-bind /dev/null <symlink>`, which bwrap rejects at
  * startup ("Is a directory" for relative link targets, ENOENT for absolute
@@ -63,8 +63,8 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
     AREA = join(BASE, 'area')
     PROJ = join(AREA, 'proj')
     DOTFILES = join(AREA, 'dotfiles')
-    mkdirSync(join(DOTFILES, 'claude', 'commands'), { recursive: true })
-    mkdirSync(join(DOTFILES, 'claude', 'agents'), { recursive: true })
+    mkdirSync(join(DOTFILES, 'haijun', 'commands'), { recursive: true })
+    mkdirSync(join(DOTFILES, 'haijun', 'agents'), { recursive: true })
     mkdirSync(PROJ, { recursive: true })
   })
 
@@ -88,27 +88,27 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
     })
   }
 
-  it('denies the resolved target for a .claude directory symlink with a relative target', async () => {
-    const claudeLink = join(PROJ, '.claude')
-    symlinkSync(join('..', 'dotfiles', 'claude'), claudeLink)
+  it('denies the resolved target for a .haijun directory symlink with a relative target', async () => {
+    const haijunLink = join(PROJ, '.haijun')
+    symlinkSync(join('..', 'dotfiles', 'haijun'), haijunLink)
 
-    const result = await wrap([join(PROJ, '.claude', 'commands')])
-    const resolved = join(DOTFILES, 'claude', 'commands')
+    const result = await wrap([join(PROJ, '.haijun', 'commands')])
+    const resolved = join(DOTFILES, 'haijun', 'commands')
 
     // No /dev/null bind onto the raw symlink path (bwrap aborts on those).
-    expect(result).not.toContain(`--ro-bind /dev/null ${claudeLink}`)
+    expect(result).not.toContain(`--ro-bind /dev/null ${haijunLink}`)
     // The resolved target is write-denied instead.
     expect(result).toContain(`--ro-bind ${resolved} ${resolved}`)
   })
 
-  it('denies the resolved target for a .claude directory symlink with an absolute target', async () => {
-    const claudeLink = join(PROJ, '.claude')
-    symlinkSync(join(DOTFILES, 'claude'), claudeLink)
+  it('denies the resolved target for a .haijun directory symlink with an absolute target', async () => {
+    const haijunLink = join(PROJ, '.haijun')
+    symlinkSync(join(DOTFILES, 'haijun'), haijunLink)
 
-    const result = await wrap([join(PROJ, '.claude', 'commands')])
-    const resolved = join(DOTFILES, 'claude', 'commands')
+    const result = await wrap([join(PROJ, '.haijun', 'commands')])
+    const resolved = join(DOTFILES, 'haijun', 'commands')
 
-    expect(result).not.toContain(`--ro-bind /dev/null ${claudeLink}`)
+    expect(result).not.toContain(`--ro-bind /dev/null ${haijunLink}`)
     expect(result).toContain(`--ro-bind ${resolved} ${resolved}`)
   })
 
@@ -159,17 +159,17 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
   it('emits the symlink mask only once for several denies sharing a cyclic ancestor', async () => {
     // Two --ro-bind /dev/null onto the same dest make bwrap's ensure_file()
     // fall through to creat() on a read-only mount.
-    const claudeLink = join(PROJ, '.claude')
-    const other = join(PROJ, '.claude-x')
-    symlinkSync(other, claudeLink)
-    symlinkSync(claudeLink, other)
+    const haijunLink = join(PROJ, '.haijun')
+    const other = join(PROJ, '.haijun-x')
+    symlinkSync(other, haijunLink)
+    symlinkSync(haijunLink, other)
 
     const result = await wrap([
-      join(claudeLink, 'commands'),
-      join(claudeLink, 'agents'),
+      join(haijunLink, 'commands'),
+      join(haijunLink, 'agents'),
     ])
 
-    const masks = result.split(`--ro-bind /dev/null ${claudeLink}`).length - 1
+    const masks = result.split(`--ro-bind /dev/null ${haijunLink}`).length - 1
     expect(masks).toBe(1)
   })
 
@@ -179,16 +179,16 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
     // denyWrite dest is canonicalized. If the two were compared by the raw
     // spelling the denyWrite --ro-bind would land on top of the tmpfs and
     // re-expose the real, read-denied contents.
-    const claudeLink = join(PROJ, '.claude')
-    symlinkSync(join('..', 'dotfiles', 'claude'), claudeLink)
+    const haijunLink = join(PROJ, '.haijun')
+    symlinkSync(join('..', 'dotfiles', 'haijun'), haijunLink)
 
-    const result = await wrap([join(claudeLink, 'commands')], [claudeLink])
-    const resolved = join(DOTFILES, 'claude', 'commands')
+    const result = await wrap([join(haijunLink, 'commands')], [haijunLink])
+    const resolved = join(DOTFILES, 'haijun', 'commands')
 
     expect(
-      countMounts(result, '--tmpfs', join(DOTFILES, 'claude')),
+      countMounts(result, '--tmpfs', join(DOTFILES, 'haijun')),
     ).toBeGreaterThan(0)
-    expect(countMounts(result, '--tmpfs', claudeLink)).toBe(0)
+    expect(countMounts(result, '--tmpfs', haijunLink)).toBe(0)
     expect(result).not.toContain(`--ro-bind ${resolved} ${resolved}`)
   })
 
@@ -233,20 +233,20 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
     },
   )
 
-  it('resolves the mandatory .claude deny paths when cwd/.claude is a symlink', async () => {
-    const claudeLink = join(PROJ, '.claude')
-    symlinkSync(join('..', 'dotfiles', 'claude'), claudeLink)
+  it('resolves the mandatory .haijun deny paths when cwd/.haijun is a symlink', async () => {
+    const haijunLink = join(PROJ, '.haijun')
+    symlinkSync(join('..', 'dotfiles', 'haijun'), haijunLink)
 
     const originalCwd = process.cwd()
     process.chdir(PROJ)
     try {
       // No explicit denyWithinAllow: the mandatory deny paths (cwd-relative
-      // .claude/commands, .claude/agents, .mcp.json, ...) trigger the bug.
+      // .haijun/commands, .haijun/agents, .mcp.json, ...) trigger the bug.
       const result = await wrap([])
 
-      expect(result).not.toContain(`--ro-bind /dev/null ${claudeLink}`)
+      expect(result).not.toContain(`--ro-bind /dev/null ${haijunLink}`)
       for (const sub of ['commands', 'agents']) {
-        const resolved = join(DOTFILES, 'claude', sub)
+        const resolved = join(DOTFILES, 'haijun', sub)
         expect(result).toContain(`--ro-bind ${resolved} ${resolved}`)
       }
     } finally {
@@ -255,10 +255,10 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
   })
 
   it.if(hasBwrap)(
-    'e2e: sandbox starts with a symlinked .claude and still denies writes through it',
+    'e2e: sandbox starts with a symlinked .haijun and still denies writes through it',
     async () => {
-      const claudeLink = join(PROJ, '.claude')
-      symlinkSync(join('..', 'dotfiles', 'claude'), claudeLink)
+      const haijunLink = join(PROJ, '.haijun')
+      symlinkSync(join('..', 'dotfiles', 'haijun'), haijunLink)
 
       const run = async (command: string) => {
         const wrapped = await wrapCommandWithSandboxLinux({
@@ -268,8 +268,8 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
           writeConfig: {
             allowOnly: [AREA],
             denyWithinAllow: [
-              join(PROJ, '.claude', 'commands'),
-              join(PROJ, '.claude', 'agents'),
+              join(PROJ, '.haijun', 'commands'),
+              join(PROJ, '.haijun', 'agents'),
             ],
           },
         })
@@ -289,10 +289,10 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
 
       // Writes through the symlinked path hit the denied resolved target.
       const denied = await run(
-        `sh -c 'echo evil > ${join(claudeLink, 'commands', 'evil.md')}'`,
+        `sh -c 'echo evil > ${join(haijunLink, 'commands', 'evil.md')}'`,
       )
       expect(denied.status).not.toBe(0)
-      expect(existsSync(join(DOTFILES, 'claude', 'commands', 'evil.md'))).toBe(
+      expect(existsSync(join(DOTFILES, 'haijun', 'commands', 'evil.md'))).toBe(
         false,
       )
 
@@ -304,17 +304,17 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
   )
 
   it.if(hasBwrap)(
-    'e2e: a cyclic .claude stops the sandbox instead of leaving the path writable',
+    'e2e: a cyclic .haijun stops the sandbox instead of leaving the path writable',
     async () => {
-      const claudeLink = join(PROJ, '.claude')
-      const other = join(PROJ, '.claude-x')
-      symlinkSync(other, claudeLink)
-      symlinkSync(claudeLink, other)
+      const haijunLink = join(PROJ, '.haijun')
+      const other = join(PROJ, '.haijun-x')
+      symlinkSync(other, haijunLink)
+      symlinkSync(haijunLink, other)
 
       const wrapped = await wrapCommandWithSandboxLinux({
-        command: `rm -f .claude && mkdir -p .claude/commands && echo planted > ${join(
+        command: `rm -f .haijun && mkdir -p .haijun/commands && echo planted > ${join(
           PROJ,
-          '.claude',
+          '.haijun',
           'commands',
           'planted.md',
         )}`,
@@ -322,7 +322,7 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
         readConfig: { denyOnly: [] },
         writeConfig: {
           allowOnly: [AREA],
-          denyWithinAllow: [join(PROJ, '.claude', 'commands')],
+          denyWithinAllow: [join(PROJ, '.haijun', 'commands')],
         },
       })
       const result = spawnSync(wrapped, {
@@ -333,7 +333,7 @@ describe.if(isLinux)('Symlinked deny paths (resolve-before-mask)', () => {
       })
 
       expect(result.status).not.toBe(0)
-      expect(existsSync(join(PROJ, '.claude', 'commands', 'planted.md'))).toBe(
+      expect(existsSync(join(PROJ, '.haijun', 'commands', 'planted.md'))).toBe(
         false,
       )
     },

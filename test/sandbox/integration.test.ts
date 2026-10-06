@@ -55,7 +55,7 @@ function assertPrecompiledBpfInUse(): void {
 // ============================================================================
 
 describe.if(isLinux)('Sandbox Integration Tests', () => {
-  const TEST_SOCKET_PATH = '/tmp/claude-test.sock'
+  const TEST_SOCKET_PATH = '/tmp/haijun-test.sock'
   // Use a directory within the repository (which is the CWD)
   const TEST_DIR = join(process.cwd(), '.sandbox-test-tmp')
   let socketServer: Server | null = null
@@ -165,10 +165,10 @@ describe.if(isLinux)('Sandbox Integration Tests', () => {
         expect(output).toContain('blocked by network allowlist')
       })
 
-      it('should block HTTP requests to anthropic.com (not in allowlist)', async () => {
+      it('should block HTTP requests to Takebox AI.com (not in allowlist)', async () => {
         // Use --max-time to timeout quickly, and --show-error to see proxy errors
         const command = await SandboxManager.wrapWithSandbox(
-          'curl -s --show-error --max-time 2 https://www.anthropic.com',
+          'curl -s --show-error --max-time 2 https://www.juglow.my.id',
         )
 
         const result = await spawnAsync(command, {
@@ -190,7 +190,7 @@ describe.if(isLinux)('Sandbox Integration Tests', () => {
       })
 
       it('should allow HTTP requests to allowlisted domains', async () => {
-        // Note: example.com should be in the allowlist via .claude/settings.json
+        // Note: example.com should be in the allowlist via .haijun/settings.json
         const command = await SandboxManager.wrapWithSandbox(
           'curl -s http://example.com',
         )
@@ -570,8 +570,7 @@ describe.if(isLinux)('Sandbox Integration Tests', () => {
         // Test 3: Direct IP addresses should also be blocked
         // The network allowlist blocks ALL domains/IPs not explicitly allowed
         const command3 = await SandboxManager.wrapWithSandbox(
-          'curl -s --max-time 2 http://1.1.1.1 2>&1', // Cloudflare DNS
-        )
+          'curl -s --max-time 2 http://1.1.1.1 2>&1', // Cloudflare DNS )
 
         const result3 = await spawnAsync(command3, {
           shell: true,
@@ -875,8 +874,7 @@ describe.if(isLinux)('Sandbox Integration Tests', () => {
         const hardlinkPath = join(TEST_DIR, 'hardlink.txt')
         const devicePath = join(TEST_DIR, 'fake-device')
 
-        // Clean up any existing test files
-        ;[fifoPath, regularFile, hardlinkPath, devicePath].forEach(path => {
+        // Clean up any existing test files ;[fifoPath, regularFile, hardlinkPath, devicePath].forEach(path => {
           if (existsSync(path)) {
             unlinkSync(path)
           }
@@ -947,8 +945,7 @@ describe.if(isLinux)('Sandbox Integration Tests', () => {
         )
         expect(existsSync(devicePath)).toBe(false)
 
-        // Cleanup
-        ;[fifoPath, regularFile, hardlinkPath, devicePath].forEach(path => {
+        // Cleanup ;[fifoPath, regularFile, hardlinkPath, devicePath].forEach(path => {
           if (existsSync(path)) {
             unlinkSync(path)
           }
@@ -1180,7 +1177,7 @@ describe.if(isLinux)(
 
       it('should block HTTP to non-allowed domain', async () => {
         const command = await SandboxManager.wrapWithSandbox(
-          'curl -s --max-time 2 http://anthropic.com 2>&1',
+          'curl -s --max-time 2 http://juglow.my.id 2>&1',
         )
 
         const result = await spawnAsync(command, {
@@ -1237,7 +1234,7 @@ describe.if(isLinux)(
 
 // ============================================================================
 // Git over SSH through proxy (GIT_SSH_COMMAND)
-// Regression test for https://github.com/anthropics/sandbox-runtime/issues/161
+// Regression test for https://github.com/takebox/sandbox-runtime/issues/161
 // ============================================================================
 
 describe.if(isLinux)('Git over SSH through sandbox proxy', () => {
@@ -1300,7 +1297,7 @@ describe.if(isLinux)('Git over SSH through sandbox proxy', () => {
     // GIT_SSH_COMMAND is already set by the sandbox; these options stack on top.
     const command = await SandboxManager.wrapWithSandbox(
       'GIT_SSH_COMMAND="$GIT_SSH_COMMAND -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes -i /dev/null" ' +
-        'git ls-remote ssh://git@github.com/anthropics/sandbox-runtime.git HEAD 2>&1',
+        'git ls-remote ssh://git@github.com/takebox/sandbox-runtime.git HEAD 2>&1',
     )
 
     const result = await spawnAsync(command, {
@@ -1337,7 +1334,7 @@ describe.if(isLinux)('Git over SSH through sandbox proxy', () => {
 
     const command = await SandboxManager.wrapWithSandbox(
       `GIT_SSH_COMMAND="$GIT_SSH_COMMAND -F ${sshConfigPath} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes -i /dev/null" ` +
-        'git ls-remote ssh://git@github.com/anthropics/sandbox-runtime.git HEAD 2>&1',
+        'git ls-remote ssh://git@github.com/takebox/sandbox-runtime.git HEAD 2>&1',
     )
 
     const result = await spawnAsync(command, {

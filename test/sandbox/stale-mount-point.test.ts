@@ -254,9 +254,9 @@ describe.if(isLinux)(
     const BWRAP_CAN_NAMESPACE = bwrapCanNamespace()
     let BASE: string
     let AREA: string // allowed write area
-    let PROJ: string // a project with no .claude/, so two mandatory denies
-    //                  (.claude/commands, .claude/agents) are absent under it
-    let DOT_CLAUDE: string // the destination both of them land on
+    let PROJ: string // a project with no .haijun/, so two mandatory denies
+    //                  (.haijun/commands, .haijun/agents) are absent under it
+    let DOT_HAIJUN: string // the destination both of them land on
 
     const savedCwd = process.cwd()
     const savedTmpdir = process.env.TMPDIR
@@ -268,7 +268,7 @@ describe.if(isLinux)(
       BASE = realpathSync(mkdtempSync(join(tmpdir(), 'deny-placeholder-')))
       AREA = join(BASE, 'area')
       PROJ = join(AREA, 'proj')
-      DOT_CLAUDE = join(PROJ, '.claude')
+      DOT_HAIJUN = join(PROJ, '.haijun')
       mkdirSync(PROJ, { recursive: true })
       process.chdir(PROJ)
       // The sources are minted under os.tmpdir(), which is read from the
@@ -302,7 +302,7 @@ describe.if(isLinux)(
     /**
      * Like wrap(), but with the temp dir the sources are minted under writable
      * too: the shape a host $TMPDIR inside a default write path produces
-     * (/tmp/claude is one, and it is the value this library stamps on
+     * (/tmp/haijun is one, and it is the value this library stamps on
      * sandboxed children).
      */
     async function wrapWithWritableTempDir(
@@ -328,13 +328,13 @@ describe.if(isLinux)(
       dest: string,
     ): string | undefined {
       const [flag, source] = lastMountAt(command, dest)?.split(' ') ?? []
-      return flag === '--ro-bind' && source?.includes('/claude-empty-')
+      return flag === '--ro-bind' && source?.includes('/haijun-empty-')
         ? source
         : undefined
     }
 
     function emptySourceDirs(): string[] {
-      return readdirSync(tmpdir()).filter(n => n.startsWith('claude-empty-'))
+      return readdirSync(tmpdir()).filter(n => n.startsWith('haijun-empty-'))
     }
 
     it('binds one source for every empty-directory mount point, and takes it away with them', async () => {
@@ -343,11 +343,11 @@ describe.if(isLinux)(
       const sources: string[] = []
       for (let i = 0; i < 3; i++) {
         const command = await wrap()
-        const source = placeholderSourceAt(command, DOT_CLAUDE)
+        const source = placeholderSourceAt(command, DOT_HAIJUN)
         expect(source).toBeDefined()
-        // .claude/commands and .claude/agents share the missing component
-        // <cwd>/.claude: one destination, one bind, one source.
-        expect(countMounts(command, '--ro-bind', source!, DOT_CLAUDE)).toBe(1)
+        // .haijun/commands and .haijun/agents share the missing component
+        // <cwd>/.haijun: one destination, one bind, one source.
+        expect(countMounts(command, '--ro-bind', source!, DOT_HAIJUN)).toBe(1)
         sources.push(source!)
       }
       expect(new Set(sources).size).toBe(1)
@@ -358,25 +358,25 @@ describe.if(isLinux)(
 
       // A wrap after the cleanup makes a new one rather than binding a path
       // that is no longer there.
-      const source = placeholderSourceAt(await wrap(), DOT_CLAUDE)
+      const source = placeholderSourceAt(await wrap(), DOT_HAIJUN)
       expect(source).toBeDefined()
       expect(source).not.toBe(sources[0])
       expect(existsSync(source!)).toBe(true)
     })
 
     it('emits one placeholder per destination, as a directory when the kinds collide', async () => {
-      // denyWrite names the missing <cwd>/.claude itself, which asks for a
-      // /dev/null placeholder, while the mandatory <cwd>/.claude/commands asks
+      // denyWrite names the missing <cwd>/.haijun itself, which asks for a
+      // /dev/null placeholder, while the mandatory <cwd>/.haijun/commands asks
       // for a directory at the same destination.
-      const command = await wrap([DOT_CLAUDE])
+      const command = await wrap([DOT_HAIJUN])
 
-      const source = placeholderSourceAt(command, DOT_CLAUDE)
+      const source = placeholderSourceAt(command, DOT_HAIJUN)
       expect(source).toBeDefined()
       // One bind of the directory form, and no /dev/null one anywhere: the
       // last mount at the destination being the directory form is not on its
       // own enough, an earlier /dev/null bind there is the abort.
-      expect(countMounts(command, '--ro-bind', source!, DOT_CLAUDE)).toBe(1)
-      expect(countMounts(command, '--ro-bind', '/dev/null', DOT_CLAUDE)).toBe(0)
+      expect(countMounts(command, '--ro-bind', source!, DOT_HAIJUN)).toBe(1)
+      expect(countMounts(command, '--ro-bind', '/dev/null', DOT_HAIJUN)).toBe(0)
     })
 
     it.skipIf(!BWRAP_CAN_NAMESPACE)(
@@ -384,7 +384,7 @@ describe.if(isLinux)(
       async () => {
         // Two binds at one destination made bwrap refuse to start with
         // "Can't mkdir <dest>: Not a directory".
-        const started = run(await wrap([DOT_CLAUDE], `echo ${BOOTED}`), PROJ)
+        const started = run(await wrap([DOT_HAIJUN], `echo ${BOOTED}`), PROJ)
         expect(started.stdout).not.toMatch(/Not a directory/)
         expect(started.status).toBe(0)
         expect(started.stdout).toContain(BOOTED)
@@ -393,15 +393,15 @@ describe.if(isLinux)(
         // the next wrap sees an existing path and emits no placeholder at all,
         // so the deny below would not be the one this test is about.
         cleanupBwrapMountPoints({ force: true })
-        expect(existsSync(DOT_CLAUDE)).toBe(false)
+        expect(existsSync(DOT_HAIJUN)).toBe(false)
 
         const denyCommand = await wrap(
-          [DOT_CLAUDE],
-          `echo ${BOOTED}; mkdir -p ${join(DOT_CLAUDE, 'commands')}; echo rc=$?`,
+          [DOT_HAIJUN],
+          `echo ${BOOTED}; mkdir -p ${join(DOT_HAIJUN, 'commands')}; echo rc=$?`,
         )
-        const source = placeholderSourceAt(denyCommand, DOT_CLAUDE)
+        const source = placeholderSourceAt(denyCommand, DOT_HAIJUN)
         expect(source).toBeDefined()
-        expect(countMounts(denyCommand, '--ro-bind', source!, DOT_CLAUDE)).toBe(
+        expect(countMounts(denyCommand, '--ro-bind', source!, DOT_HAIJUN)).toBe(
           1,
         )
 
@@ -410,14 +410,14 @@ describe.if(isLinux)(
         expect(denied.stdout).toContain(BOOTED)
         expect(denied.stdout).toMatch(/rc=[1-9]/)
         cleanupBwrapMountPoints({ force: true })
-        expect(existsSync(DOT_CLAUDE)).toBe(false)
+        expect(existsSync(DOT_HAIJUN)).toBe(false)
       },
     )
 
     it('reuses the source while it is still our own empty directory', async () => {
-      const first = placeholderSourceAt(await wrap(), DOT_CLAUDE)
+      const first = placeholderSourceAt(await wrap(), DOT_HAIJUN)
       expect(first).toBeDefined()
-      expect(placeholderSourceAt(await wrap(), DOT_CLAUDE)).toBe(first!)
+      expect(placeholderSourceAt(await wrap(), DOT_HAIJUN)).toBe(first!)
     })
 
     // The source sits under the system temp dir, which sandboxed commands
@@ -441,15 +441,15 @@ describe.if(isLinux)(
       ],
       ['its mode has been widened', (p: string) => chmodSync(p, 0o755)],
     ])('makes a fresh source when %s', async (_what, tamper) => {
-      const first = placeholderSourceAt(await wrap(), DOT_CLAUDE)!
+      const first = placeholderSourceAt(await wrap(), DOT_HAIJUN)!
       tamper(first)
 
       const command = await wrap()
-      const second = placeholderSourceAt(command, DOT_CLAUDE)!
+      const second = placeholderSourceAt(command, DOT_HAIJUN)!
       expect(second).not.toBe(first)
       // Neither bound over the destination nor pinned: nothing in this wrap
       // reaches the path that is no longer ours.
-      expect(countMounts(command, '--ro-bind', first, DOT_CLAUDE)).toBe(0)
+      expect(countMounts(command, '--ro-bind', first, DOT_HAIJUN)).toBe(0)
       expect(countMounts(command, '--ro-bind', first, first)).toBe(0)
       expect(lstatSync(second).isSymbolicLink()).toBe(false)
       expect(readdirSync(second)).toEqual([])
@@ -495,14 +495,14 @@ describe.if(isLinux)(
       const [first, second] = wrapped.stdout
         .split('\n')
         .filter(line => line.includes('--ro-bind'))
-        .map(line => placeholderSourceAt(line, DOT_CLAUDE))
+        .map(line => placeholderSourceAt(line, DOT_HAIJUN))
       expect(first).toBeDefined()
       expect(second).toBe(first!)
     })
 
     it('pins the source read-only, after every other mount', async () => {
       const command = await wrap()
-      const source = placeholderSourceAt(command, DOT_CLAUDE)!
+      const source = placeholderSourceAt(command, DOT_HAIJUN)!
 
       // Last, like the masked-file store's own pin, so nothing emitted after
       // it can put a writable mount back over the source — neither on the
@@ -523,17 +523,17 @@ describe.if(isLinux)(
         // deny, in this sandbox and in every concurrent one sharing it.
         const source = placeholderSourceAt(
           await wrapWithWritableTempDir(),
-          DOT_CLAUDE,
+          DOT_HAIJUN,
         )!
         const planted = join(source, 'commands')
         const command = await wrapWithWritableTempDir(
           `echo ${BOOTED}; ` +
             `mkdir -p ${planted} 2>&1; echo "mkdir rc=$?"; ` +
             `echo ${SENTINEL} > ${join(planted, 'x.md')} 2>&1; ` +
-            `cat ${join(DOT_CLAUDE, 'commands', 'x.md')} 2>&1`,
+            `cat ${join(DOT_HAIJUN, 'commands', 'x.md')} 2>&1`,
         )
-        expect(placeholderSourceAt(command, DOT_CLAUDE)).toBe(source)
-        expect(countMounts(command, '--ro-bind', source, DOT_CLAUDE)).toBe(1)
+        expect(placeholderSourceAt(command, DOT_HAIJUN)).toBe(source)
+        expect(countMounts(command, '--ro-bind', source, DOT_HAIJUN)).toBe(1)
 
         const attempt = run(command, PROJ)
         expect(attempt.stdout).toContain(BOOTED)

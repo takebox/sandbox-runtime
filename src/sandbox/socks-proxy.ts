@@ -90,8 +90,7 @@ export function createSocksProxyServer(
       if (
         (conn.username === PROXY_AUTH_USER ||
           conn.username.startsWith(`${PROXY_AUTH_USER}.`)) &&
-        conn.password === options.proxyAuthToken
-      ) {
+        conn.password === options.proxyAuthToken ) {
         accept()
       } else {
         logForDebugging('SOCKS auth rejected', { level: 'error' })

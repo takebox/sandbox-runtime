@@ -122,7 +122,7 @@ describe.if(isLinux)('Deny stubs under a read-only denied directory', () => {
       .join(' ')
     expect(afterReadOnlyRebind).not.toContain(`/dev/null ${PROJ}/`)
     expect(afterReadOnlyRebind).not.toMatch(
-      /--ro-bind \S*claude-empty-\S+ \S*\/proj\//,
+      /--ro-bind \S*haijun-empty-\S+ \S*\/proj\//,
     )
   })
 

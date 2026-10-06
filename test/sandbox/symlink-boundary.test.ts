@@ -22,10 +22,10 @@ import type { FsWriteRestrictionConfig } from '../../src/sandbox/sandbox-schemas
 import { isMacOS } from '../helpers/platform.js'
 
 /**
- * Safely remove /tmp/claude if it exists (file, directory, or symlink)
+ * Safely remove /tmp/haijun if it exists (file, directory, or symlink)
  */
-function cleanupTmpClaude(): void {
-  const paths = ['/tmp/claude', '/private/tmp/claude']
+function cleanupTmpHaijun(): void {
+  const paths = ['/tmp/haijun', '/private/tmp/haijun']
   for (const p of paths) {
     try {
       if (existsSync(p) || lstatSync(p).isSymbolicLink()) {
@@ -54,8 +54,8 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
   const TEST_CONTENT = 'TEST_CONTENT'
 
   beforeEach(() => {
-    // Clean up any existing /tmp/claude symlink from previous runs
-    cleanupTmpClaude()
+    // Clean up any existing /tmp/haijun symlink from previous runs
+    cleanupTmpHaijun()
 
     // Create fresh test directory structure
     if (existsSync(TEST_BASE_DIR)) {
@@ -65,8 +65,8 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
   })
 
   afterEach(() => {
-    // Clean up /tmp/claude
-    cleanupTmpClaude()
+    // Clean up /tmp/haijun
+    cleanupTmpHaijun()
 
     // Clean up test directories and files
     if (existsSync(TEST_BASE_DIR)) {
@@ -83,7 +83,7 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
       console.log('\n=== Step 1: Initial write attempt (should be blocked) ===')
 
       const writeConfig: FsWriteRestrictionConfig = {
-        allowOnly: [WORKSPACE_DIR, '/tmp/claude', '/private/tmp/claude'],
+        allowOnly: [WORKSPACE_DIR, '/tmp/haijun', '/private/tmp/haijun'],
         denyWithinAllow: [],
       }
 
@@ -105,11 +105,11 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
       expect(existsSync(OUTSIDE_WORKSPACE_FILE)).toBe(false)
       console.log('✓ Initial write correctly blocked')
 
-      // Step 2: Create symlink /tmp/claude -> /
-      console.log('\n=== Step 2: Creating symlink /tmp/claude -> / ===')
+      // Step 2: Create symlink /tmp/haijun -> /
+      console.log('\n=== Step 2: Creating symlink /tmp/haijun -> / ===')
 
       const symlinkCommand = wrapCommandWithSandboxMacOS({
-        command: 'ln -s / /tmp/claude',
+        command: 'ln -s / /tmp/haijun',
         needsNetworkRestriction: false,
         readConfig: undefined,
         writeConfig,
@@ -121,13 +121,13 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
         timeout: 5000,
       })
 
-      // Creating the symlink should succeed (we're writing to /tmp/claude which is allowed)
+      // Creating the symlink should succeed (we're writing to /tmp/haijun which is allowed)
       expect(symlinkResult.status).toBe(0)
 
       // Verify symlink was created
-      const stat = lstatSync('/tmp/claude')
+      const stat = lstatSync('/tmp/haijun')
       expect(stat.isSymbolicLink()).toBe(true)
-      console.log('✓ Symlink created: /tmp/claude -> /')
+      console.log('✓ Symlink created: /tmp/haijun -> /')
 
       // Step 3: Verify sandbox still blocks writes outside workspace
       console.log(
@@ -148,7 +148,7 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
         timeout: 5000,
       })
 
-      // The symlink should NOT cause /tmp/claude to resolve to / in the profile
+      // The symlink should NOT cause /tmp/haijun to resolve to / in the profile
       expect(secondResult.status).not.toBe(0)
       expect(existsSync(OUTSIDE_WORKSPACE_FILE)).toBe(false)
       console.log('✓ Write correctly blocked with symlink boundary validation')
@@ -157,13 +157,13 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
       console.log('Symlink boundary validation working correctly')
     })
 
-    it('should block writes outside workspace when /tmp/claude does not exist', () => {
-      // Ensure /tmp/claude doesn't exist
-      cleanupTmpClaude()
-      expect(existsSync('/tmp/claude')).toBe(false)
+    it('should block writes outside workspace when /tmp/haijun does not exist', () => {
+      // Ensure /tmp/haijun doesn't exist
+      cleanupTmpHaijun()
+      expect(existsSync('/tmp/haijun')).toBe(false)
 
       const writeConfig: FsWriteRestrictionConfig = {
-        allowOnly: [WORKSPACE_DIR, '/tmp/claude', '/private/tmp/claude'],
+        allowOnly: [WORKSPACE_DIR, '/tmp/haijun', '/private/tmp/haijun'],
         denyWithinAllow: [],
       }
 
@@ -185,17 +185,17 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
       expect(existsSync(OUTSIDE_WORKSPACE_FILE)).toBe(false)
     })
 
-    it('should block writes outside workspace when /tmp/claude is a regular directory', () => {
-      // Create /tmp/claude as a regular directory
-      cleanupTmpClaude()
-      mkdirSync('/tmp/claude', { recursive: true })
+    it('should block writes outside workspace when /tmp/haijun is a regular directory', () => {
+      // Create /tmp/haijun as a regular directory
+      cleanupTmpHaijun()
+      mkdirSync('/tmp/haijun', { recursive: true })
 
-      const stat = lstatSync('/tmp/claude')
+      const stat = lstatSync('/tmp/haijun')
       expect(stat.isDirectory()).toBe(true)
       expect(stat.isSymbolicLink()).toBe(false)
 
       const writeConfig: FsWriteRestrictionConfig = {
-        allowOnly: [WORKSPACE_DIR, '/tmp/claude', '/private/tmp/claude'],
+        allowOnly: [WORKSPACE_DIR, '/tmp/haijun', '/private/tmp/haijun'],
         denyWithinAllow: [],
       }
 
@@ -218,20 +218,20 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
     })
 
     it('should block writes via symlink traversal path', () => {
-      // Create symlink /tmp/claude -> /
-      cleanupTmpClaude()
-      spawnSync('ln', ['-s', '/', '/tmp/claude'], { encoding: 'utf8' })
+      // Create symlink /tmp/haijun -> /
+      cleanupTmpHaijun()
+      spawnSync('ln', ['-s', '/', '/tmp/haijun'], { encoding: 'utf8' })
 
-      const stat = lstatSync('/tmp/claude')
+      const stat = lstatSync('/tmp/haijun')
       expect(stat.isSymbolicLink()).toBe(true)
 
-      // This file path goes through /tmp/claude (the symlink) to reach a location
+      // This file path goes through /tmp/haijun (the symlink) to reach a location
       // that would be outside the allowed write paths if symlink was followed
       const traversalPath =
-        '/tmp/claude/tmp/traversal-write-' + TEST_ID + '.txt'
+        '/tmp/haijun/tmp/traversal-write-' + TEST_ID + '.txt'
 
       const writeConfig: FsWriteRestrictionConfig = {
-        allowOnly: [WORKSPACE_DIR, '/tmp/claude', '/private/tmp/claude'],
+        allowOnly: [WORKSPACE_DIR, '/tmp/haijun', '/private/tmp/haijun'],
         denyWithinAllow: [],
       }
 
@@ -248,7 +248,7 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
         timeout: 5000,
       })
 
-      // The sandbox should NOT resolve /tmp/claude to / in the profile
+      // The sandbox should NOT resolve /tmp/haijun to / in the profile
       const realPath = `/tmp/traversal-write-${TEST_ID}.txt`
 
       expect(result.status).not.toBe(0)
@@ -260,11 +260,11 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
   describe('isSymlinkOutsideBoundary Integration', () => {
     it('should reject symlink resolution that broadens scope', () => {
       // Create symlink pointing to root
-      cleanupTmpClaude()
-      spawnSync('ln', ['-s', '/', '/tmp/claude'], { encoding: 'utf8' })
+      cleanupTmpHaijun()
+      spawnSync('ln', ['-s', '/', '/tmp/haijun'], { encoding: 'utf8' })
 
       const writeConfig: FsWriteRestrictionConfig = {
-        allowOnly: [WORKSPACE_DIR, '/tmp/claude', '/private/tmp/claude'],
+        allowOnly: [WORKSPACE_DIR, '/tmp/haijun', '/private/tmp/haijun'],
         denyWithinAllow: [],
       }
 
@@ -299,14 +299,14 @@ describe.if(isMacOS)('macOS Seatbelt Symlink Boundary Validation', () => {
 describe('isSymlinkOutsideBoundary Unit Tests', () => {
   describe('Outside Boundary Detection', () => {
     it('should detect when symlink points to root', () => {
-      expect(isSymlinkOutsideBoundary('/tmp/claude', '/')).toBe(true)
-      expect(isSymlinkOutsideBoundary('/private/tmp/claude', '/')).toBe(true)
+      expect(isSymlinkOutsideBoundary('/tmp/haijun', '/')).toBe(true)
+      expect(isSymlinkOutsideBoundary('/private/tmp/haijun', '/')).toBe(true)
       expect(isSymlinkOutsideBoundary('/home/user/data', '/')).toBe(true)
     })
 
     it('should detect when symlink points to ancestor directory', () => {
-      expect(isSymlinkOutsideBoundary('/tmp/claude/data', '/tmp')).toBe(true)
-      expect(isSymlinkOutsideBoundary('/tmp/claude/data', '/tmp/claude')).toBe(
+      expect(isSymlinkOutsideBoundary('/tmp/haijun/data', '/tmp')).toBe(true)
+      expect(isSymlinkOutsideBoundary('/tmp/haijun/data', '/tmp/haijun')).toBe(
         true,
       )
       expect(isSymlinkOutsideBoundary('/home/user/project/src', '/home')).toBe(
@@ -318,19 +318,19 @@ describe('isSymlinkOutsideBoundary Unit Tests', () => {
     })
 
     it('should detect when resolved path is very short', () => {
-      expect(isSymlinkOutsideBoundary('/tmp/claude', '/tmp')).toBe(true)
+      expect(isSymlinkOutsideBoundary('/tmp/haijun', '/tmp')).toBe(true)
       expect(isSymlinkOutsideBoundary('/var/data', '/var')).toBe(true)
       expect(isSymlinkOutsideBoundary('/usr/local/bin', '/usr')).toBe(true)
     })
 
     it('should detect when symlink points to unrelated directory', () => {
       // Symlink pointing to home directory or other unrelated paths
-      expect(isSymlinkOutsideBoundary('/tmp/claude', '/Users/dworken')).toBe(
+      expect(isSymlinkOutsideBoundary('/tmp/haijun', '/Users/dworken')).toBe(
         true,
       )
-      expect(isSymlinkOutsideBoundary('/tmp/claude', '/home/user')).toBe(true)
-      expect(isSymlinkOutsideBoundary('/tmp/claude', '/etc')).toBe(true)
-      expect(isSymlinkOutsideBoundary('/tmp/claude', '/opt/data')).toBe(true)
+      expect(isSymlinkOutsideBoundary('/tmp/haijun', '/home/user')).toBe(true)
+      expect(isSymlinkOutsideBoundary('/tmp/haijun', '/etc')).toBe(true)
+      expect(isSymlinkOutsideBoundary('/tmp/haijun', '/opt/data')).toBe(true)
       expect(isSymlinkOutsideBoundary('/var/data', '/Users/someone/data')).toBe(
         true,
       )
@@ -339,18 +339,18 @@ describe('isSymlinkOutsideBoundary Unit Tests', () => {
 
   describe('Valid Resolutions', () => {
     it('should allow resolution to same path', () => {
-      expect(isSymlinkOutsideBoundary('/tmp/claude', '/tmp/claude')).toBe(false)
+      expect(isSymlinkOutsideBoundary('/tmp/haijun', '/tmp/haijun')).toBe(false)
       expect(isSymlinkOutsideBoundary('/home/user', '/home/user')).toBe(false)
     })
 
     it('should allow macOS /tmp -> /private/tmp canonical resolution', () => {
       expect(
-        isSymlinkOutsideBoundary('/tmp/claude', '/private/tmp/claude'),
+        isSymlinkOutsideBoundary('/tmp/haijun', '/private/tmp/haijun'),
       ).toBe(false)
       expect(
         isSymlinkOutsideBoundary(
-          '/tmp/claude/data',
-          '/private/tmp/claude/data',
+          '/tmp/haijun/data',
+          '/private/tmp/haijun/data',
         ),
       ).toBe(false)
     })
@@ -366,7 +366,7 @@ describe('isSymlinkOutsideBoundary Unit Tests', () => {
 
     it('should allow resolution to deeper path (more specific)', () => {
       expect(
-        isSymlinkOutsideBoundary('/tmp/claude', '/tmp/claude/actual'),
+        isSymlinkOutsideBoundary('/tmp/haijun', '/tmp/haijun/actual'),
       ).toBe(false)
       expect(isSymlinkOutsideBoundary('/home/user', '/home/user/real')).toBe(
         false,
@@ -377,12 +377,12 @@ describe('isSymlinkOutsideBoundary Unit Tests', () => {
   describe('Edge Cases', () => {
     it('should handle paths with trailing slashes', () => {
       // path.normalize removes trailing slashes, so these should work
-      expect(isSymlinkOutsideBoundary('/tmp/claude/', '/')).toBe(true)
+      expect(isSymlinkOutsideBoundary('/tmp/haijun/', '/')).toBe(true)
     })
 
     it('should handle private paths resolving to themselves', () => {
       expect(
-        isSymlinkOutsideBoundary('/private/tmp/claude', '/private/tmp/claude'),
+        isSymlinkOutsideBoundary('/private/tmp/haijun', '/private/tmp/haijun'),
       ).toBe(false)
       expect(
         isSymlinkOutsideBoundary('/private/var/data', '/private/var/data'),
@@ -406,8 +406,8 @@ describe('isAtOrUnder', () => {
  * Tests for glob pattern symlink boundary validation
  */
 describe.if(isMacOS)('Glob Pattern Symlink Boundary', () => {
-  function cleanupTmpClaude(): void {
-    const paths = ['/tmp/claude', '/private/tmp/claude']
+  function cleanupTmpHaijun(): void {
+    const paths = ['/tmp/haijun', '/private/tmp/haijun']
     for (const p of paths) {
       try {
         const stat = lstatSync(p)
@@ -424,33 +424,33 @@ describe.if(isMacOS)('Glob Pattern Symlink Boundary', () => {
 
   it('should preserve original glob pattern when base directory symlink points to root', () => {
     // Clean up and create symlink
-    cleanupTmpClaude()
-    spawnSync('ln', ['-s', '/', '/tmp/claude'], { encoding: 'utf8' })
+    cleanupTmpHaijun()
+    spawnSync('ln', ['-s', '/', '/tmp/haijun'], { encoding: 'utf8' })
 
     // Test that glob pattern doesn't resolve to /**
-    const result = normalizePathForSandbox('/tmp/claude/**')
+    const result = normalizePathForSandbox('/tmp/haijun/**')
 
     // Should keep original pattern, not resolve to /**
-    expect(result).toBe('/tmp/claude/**')
+    expect(result).toBe('/tmp/haijun/**')
     expect(result).not.toBe('/**')
 
     // Clean up
-    cleanupTmpClaude()
+    cleanupTmpHaijun()
   })
 
   it('should preserve original glob pattern when base directory symlink points to parent', () => {
     // Clean up and create symlink pointing to /tmp (parent)
-    cleanupTmpClaude()
-    spawnSync('ln', ['-s', '/tmp', '/tmp/claude'], { encoding: 'utf8' })
+    cleanupTmpHaijun()
+    spawnSync('ln', ['-s', '/tmp', '/tmp/haijun'], { encoding: 'utf8' })
 
     // Test that glob pattern doesn't resolve to /tmp/**
-    const result = normalizePathForSandbox('/tmp/claude/**')
+    const result = normalizePathForSandbox('/tmp/haijun/**')
 
     // Should keep original pattern
-    expect(result).toBe('/tmp/claude/**')
+    expect(result).toBe('/tmp/haijun/**')
     expect(result).not.toBe('/tmp/**')
 
     // Clean up
-    cleanupTmpClaude()
+    cleanupTmpHaijun()
   })
 })

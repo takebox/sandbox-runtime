@@ -615,8 +615,7 @@ impl ProcThreadAttrs {
         unsafe {
             InitializeProcThreadAttributeList(
                 Some(LPPROC_THREAD_ATTRIBUTE_LIST(
-                    storage.as_mut_ptr() as *mut c_void
-                )),
+                    storage.as_mut_ptr() as *mut c_void )),
                 count,
                 None,
                 &mut size,

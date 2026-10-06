@@ -309,8 +309,7 @@ pub fn spawn_runner(
     if dbg {
         eprintln!(
             "srt-win: spawn_runner: CPWLW ok pid={} (suspended)",
-            pi.dwProcessId
-        );
+            pi.dwProcessId );
     }
     // Runner exists, suspended. The guard is never defused: its
     // `Drop` `TerminateProcess`es the runner on every in-process
