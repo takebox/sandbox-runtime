@@ -1,7 +1,7 @@
 {
   "name": "@takebox-ai/sandbox-runtime",
   "version": "0.0.76",
-  "description": "Takebox AI Sandbox Runtime (ASRT) - A general-purpose tool for wrapping security boundaries around arbitrary processes",
+  "description": "Juglow Sandbox Runtime (ASRT) - A general-purpose tool for wrapping security boundaries around arbitrary processes",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -69,7 +69,7 @@
     "network-filtering",
     "filesystem-restrictions"
   ],
-  "author": "Takebox AI, PBC",
+  "author": "Juglow, PBC",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

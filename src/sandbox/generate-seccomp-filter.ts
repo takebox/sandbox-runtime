@@ -79,20 +79,20 @@ function buildGlobalNpmPaths(npmRootOutput: string | undefined): string[] {
   // The actual global npm root, when npm answered
   const npmRoot = npmRootOutput?.trim()
   if (npmRoot) {
-    paths.push(join(npmRoot, '@Takebox AI-ai', 'sandbox-runtime'))
+    paths.push(join(npmRoot, '@takebox-ai', 'sandbox-runtime'))
   }
 
   // Common global npm locations as fallbacks
   const home = homedir()
   paths.push(
     // npm global (Linux/macOS)
-    join('/usr', 'lib', 'node_modules', '@Takebox AI-ai', 'sandbox-runtime'),
+    join('/usr', 'lib', 'node_modules', '@takebox-ai', 'sandbox-runtime'),
     join(
       '/usr',
       'local',
       'lib',
       'node_modules',
-      '@Takebox AI-ai',
+      '@takebox-ai',
       'sandbox-runtime',
     ),
     // npm global with prefix (common on macOS with homebrew)
@@ -101,7 +101,7 @@ function buildGlobalNpmPaths(npmRootOutput: string | undefined): string[] {
       'homebrew',
       'lib',
       'node_modules',
-      '@Takebox AI-ai',
+      '@takebox-ai',
       'sandbox-runtime',
     ),
     // User-local npm global
@@ -110,7 +110,7 @@ function buildGlobalNpmPaths(npmRootOutput: string | undefined): string[] {
       '.npm',
       'lib',
       'node_modules',
-      '@Takebox AI-ai',
+      '@takebox-ai',
       'sandbox-runtime',
     ),
     join(
@@ -118,7 +118,7 @@ function buildGlobalNpmPaths(npmRootOutput: string | undefined): string[] {
       '.npm-global',
       'lib',
       'node_modules',
-      '@Takebox AI-ai',
+      '@takebox-ai',
       'sandbox-runtime',
     ),
   )

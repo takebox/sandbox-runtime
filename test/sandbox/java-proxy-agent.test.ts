@@ -109,7 +109,7 @@ describe('getJavaProxyAgentJarPath', () => {
     const asyncPaths = await getGlobalNpmPathsAsync()
     expect(getGlobalNpmPaths()).toBe(asyncPaths)
     expect(asyncPaths).toContain(
-      join('/usr', 'lib', 'node_modules', '@Takebox AI-ai', 'sandbox-runtime'),
+      join('/usr', 'lib', 'node_modules', '@takebox-ai', 'sandbox-runtime'),
     )
   })
 

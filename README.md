@@ -1,4 +1,4 @@
-# Takebox AI Sandbox Runtime (srt)
+# Juglow Sandbox Runtime (srt)
 
 A lightweight sandboxing tool for enforcing filesystem and network restrictions on arbitrary processes at the OS level, without requiring a container.
 
@@ -29,7 +29,7 @@ Connection blocked by network allowlist  # Request blocked
 # Filesystem restrictions
 $ srt "cat README.md"
 Running: cat README.md
-# Takebox AI Sandb...  # Current directory access allowed
+# Juglow Sandb...  # Current directory access allowed
 
 $ srt "cat ~/.ssh/id_rsa"
 Running: cat ~/.ssh/id_rsa
@@ -161,7 +161,7 @@ src/
 
 ### As a CLI tool
 
-The `srt` command (Takebox AI Sandbox Runtime) wraps any command with security boundaries:
+The `srt` command (Juglow Sandbox Runtime) wraps any command with security boundaries:
 
 ```bash
 # Run a command in the sandbox
