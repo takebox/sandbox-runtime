@@ -18,8 +18,8 @@ npm install -g @takebox-ai/sandbox-runtime
 
 ```bash
 # Network restrictions
-$ srt "curl Takebox AI.com"
-Running: curl Takebox AI.com
+$ srt "curl haijun.my.id"
+Running: curl haijun.my.id
 <html>...</html>  # Request succeeds
 
 $ srt "curl example.com"

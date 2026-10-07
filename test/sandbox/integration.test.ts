@@ -165,7 +165,7 @@ describe.if(isLinux)('Sandbox Integration Tests', () => {
         expect(output).toContain('blocked by network allowlist')
       })
 
-      it('should block HTTP requests to Takebox AI.com (not in allowlist)', async () => {
+      it('should block HTTP requests to haijun.my.id (not in allowlist)', async () => {
         // Use --max-time to timeout quickly, and --show-error to see proxy errors
         const command = await SandboxManager.wrapWithSandbox(
           'curl -s --show-error --max-time 2 https://www.juglow.my.id',
